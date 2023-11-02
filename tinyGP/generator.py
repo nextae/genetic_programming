@@ -52,7 +52,7 @@ def generate(n_rand: int, min_rand: int, max_rand: int, n_fit_cases: int):
         n_var = VAR_COUNT[function]
         ranges = RANGES[function]
 
-        count = n_fit_cases ** (1 / n_var)
+        count = n_fit_cases / (2 ** (n_var - 1))
         if not count.is_integer():
             raise ValueError(f'Cannot equally divide the space for {n_fit_cases} fit cases and {n_var} variables')
 
