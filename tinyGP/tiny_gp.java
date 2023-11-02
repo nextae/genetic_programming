@@ -244,9 +244,19 @@ public class tiny_gp {
         }
         avg_len = (double) node_count / POPSIZE;
         favgpop /= POPSIZE;
+
         System.out.print("Generation="+gen+" Avg Fitness="+(-favgpop)+
                 " Best Fitness="+(-fbestpop)+" Avg Size="+avg_len+
                 "\n=");
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("gp_output/"+file, true));
+            writer.write(gen+"\t"+(-favgpop)+"\t"+(-fbestpop)+"\n");
+            writer.close();
+        } catch (IOException e){
+            System.out.println("Error writing to file "+file);
+            e.printStackTrace();
+        }
+
         print_indiv( pop[best], 0 );
         System.out.print( "\n");
         System.out.flush();
@@ -389,9 +399,22 @@ public class tiny_gp {
         System.exit( 1 );
     }
 
+    static String file = "function1_0_100.txt";
+
     public static void main(String[] args) {
-        String file = "function6_-10_10.txt";
         String fname = "data/"+file;
+
+        try {
+            File f = new File("gp_output/"+file);
+            f.createNewFile();
+            BufferedWriter writer = new BufferedWriter(new FileWriter("gp_output/"+file));
+            writer.write("Gen Avg_fit Best_fit\n");
+            writer.close();
+        } catch (IOException e){
+            System.out.println("File error");
+            e.printStackTrace();
+            return;
+        }
 
         long s = -1;
 
