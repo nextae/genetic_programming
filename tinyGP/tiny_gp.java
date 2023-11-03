@@ -7,8 +7,6 @@
 
 import java.util.*;
 import java.io.*;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
 public class tiny_gp {
     double [] fitness;
@@ -16,11 +14,13 @@ public class tiny_gp {
     static Random rd = new Random();
     static final int
         ADD = 110,
-            SUB = 111,
-            MUL = 112,
-            DIV = 113,
-            FSET_START = ADD,
-            FSET_END = DIV;
+        SUB = 111,
+        MUL = 112,
+        DIV = 113,
+        SIN = 114,
+        COS = 115,
+        FSET_START = ADD,
+        FSET_END = COS;
     static double [] x = new double[FSET_START];
     static double minrandom, maxrandom;
     static char [] program;
@@ -31,13 +31,13 @@ public class tiny_gp {
     static double avg_len;
     static final int
         MAX_LEN = 10000,
-                POPSIZE = 100000,
-                DEPTH   = 5,
-                GENERATIONS = 100,
-                TSIZE = 2;
+        POPSIZE = 100000,
+        DEPTH = 5,
+        GENERATIONS = 100,
+        TSIZE = 2;
     public static final double
         PMUT_PER_NODE  = 0.05,
-                       CROSSOVER_PROB = 0.9;
+        CROSSOVER_PROB = 0.9;
     static double [][] targets;
 
     double run() { /* Interpreter */
@@ -55,6 +55,8 @@ public class tiny_gp {
                            else
                                return( num / den );
                        }
+            case SIN : return Math.sin(run());
+            case COS : return Math.cos(run());
         }
         return( 0.0 ); // should never get here
     }
@@ -68,6 +70,8 @@ public class tiny_gp {
             case SUB:
             case MUL:
             case DIV:
+            case SIN:
+            case COS:
                 return( traverse( buffer, traverse( buffer, ++buffercount ) ) );
         }
         return( 0 ); // should never get here
@@ -150,6 +154,8 @@ public class tiny_gp {
                 case SUB:
                 case MUL:
                 case DIV:
+                case SIN:
+                case COS:
                     buffer[pos] = prim;
                     one_child = grow( buffer, pos+1, max,depth-1);
                     if ( one_child < 0 )
@@ -180,23 +186,37 @@ public class tiny_gp {
             case ADD: System.out.print( "(");
                       a1=print_indiv( buffer, ++buffercounter );
                       System.out.print( " + ");
-                      break;
+                      a2=print_indiv( buffer, a1 );
+                      System.out.print( ")");
+                      return( a2);
             case SUB: System.out.print( "(");
                       a1=print_indiv( buffer, ++buffercounter );
                       System.out.print( " - ");
-                      break;
+                      a2=print_indiv( buffer, a1 );
+                      System.out.print( ")");
+                      return( a2);
             case MUL: System.out.print( "(");
                       a1=print_indiv( buffer, ++buffercounter );
                       System.out.print( " * ");
-                      break;
+                      a2=print_indiv( buffer, a1 );
+                      System.out.print( ")");
+                      return( a2);
             case DIV: System.out.print( "(");
                       a1=print_indiv( buffer, ++buffercounter );
                       System.out.print( " / ");
-                      break;
+                      a2=print_indiv( buffer, a1 );
+                      System.out.print( ")");
+                      return( a2);
+            case SIN: System.out.print( "sin(");
+                      a1=print_indiv( buffer, ++buffercounter );
+                      System.out.print( "\b)");
+                      return( a1);
+            case COS: System.out.print( "cos(");
+                      a1=print_indiv( buffer, ++buffercounter );
+                      System.out.print( "\b)");
+                      return( a1);
         }
-        a2=print_indiv( buffer, a1 );
-        System.out.print( ")");
-        return( a2);
+        return( a1 );
     }
 
 
@@ -399,10 +419,12 @@ public class tiny_gp {
         System.exit( 1 );
     }
 
-    static String file = "function1_0_100.txt";
+    static String file = "function5_0_7.txt";
 
     public static void main(String[] args) {
-        String fname = "data/"+file;
+        String fname = "../data/"+file;
+
+        System.out.println(fname);
 
         try {
             File f = new File("gp_output/"+file);
