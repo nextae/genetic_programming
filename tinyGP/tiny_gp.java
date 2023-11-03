@@ -177,7 +177,7 @@ public class tiny_gp {
         if ( buffer[buffercounter] < FSET_START ) {
             if ( buffer[buffercounter] < varnumber )
 //                System.out.print( "X"+ (buffer[buffercounter] + 1 )+ " ");
-                System.out.print(alfa[buffer[buffercounter]]+" ");
+                System.out.print(alfa[buffer[buffercounter]]);
             else
                 System.out.print(x[buffer[buffercounter]]);
             return( ++buffercounter );
@@ -209,11 +209,11 @@ public class tiny_gp {
                       return( a2);
             case SIN: System.out.print( "sin(");
                       a1=print_indiv( buffer, ++buffercounter );
-                      System.out.print( "\b)");
+                      System.out.print( ")");
                       return( a1);
             case COS: System.out.print( "cos(");
                       a1=print_indiv( buffer, ++buffercounter );
-                      System.out.print( "\b)");
+                      System.out.print( ")");
                       return( a1);
         }
         return( a1 );
@@ -394,7 +394,7 @@ public class tiny_gp {
         print_parms();
         stats( fitness, pop, 0 );
         for ( gen = 1; gen < GENERATIONS; gen ++ ) {
-            if (  fbestpop > -1e-5 ) {
+            if (  fbestpop > -1e-4 ) {
                 System.out.print("PROBLEM SOLVED\n");
                 System.exit( 0 );
             }
@@ -419,7 +419,7 @@ public class tiny_gp {
         System.exit( 1 );
     }
 
-    static String file = "function5_0_7.txt";
+    static String file = "function8_0_7.28.txt";
 
     public static void main(String[] args) {
         String fname = "../data/"+file;

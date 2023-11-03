@@ -25,8 +25,14 @@ def f5(x: float, y: float) -> float:
 def f6(x: float, y: float) -> float:
     return x ** 2 + 3 * x * y - 7 * y + 1
 
+def f7(x: float) -> float:
+    return np.sin(x + 3.141592 / 2)
 
-FUNCTIONS = [f1, f2, f3, f4, f5, f6]
+def f8(x: float) -> float:
+    return np.tan(2 * x + 1)
+
+
+FUNCTIONS = [f1, f2, f3, f4, f5, f6, f7, f8]
 
 RANGES = {
     f1: [(-10, 10), (0, 100), (-1, 1), (-1000, 1000)],
@@ -35,6 +41,8 @@ RANGES = {
     f4: [(0, 1), (-10, 10), (0, 100), (-1000, 1000)],
     f5: [(-3.14, 3.14), (0, 7), (0, 100), (-100, 100)],
     f6: [(-10, 10), (0, 100), (-1, 1), (-1000, 1000)],
+    f7: [(0, 7.28)],
+    f8: [(-3.14 / 2, 3.14 / 2), (0, 7.28)]
 }
 
 VAR_COUNT = {
@@ -43,7 +51,9 @@ VAR_COUNT = {
     f3: 1,
     f4: 2,
     f5: 2,
-    f6: 2
+    f6: 2,
+    f7: 1,
+    f8: 1
 }
 
 
