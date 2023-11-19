@@ -8,6 +8,7 @@ public class ElseIfNode extends Node {
     public ElseIfNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
         this.minDepth = 2;
+        generateChildren();
     }
     @Override
     public void generateChildren() {
@@ -31,7 +32,10 @@ public class ElseIfNode extends Node {
     }
 
     @Override
-    public String toString() {
-        return null;
+    public String toString() { // TODO: make this better, indents
+        StringBuilder text = new StringBuilder();
+        for (Node child : children)
+            text.append(child.toString());
+        return text.toString();
     }
 }

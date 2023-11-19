@@ -25,7 +25,7 @@ public class StatementNode extends Node {
                     this.children.add(new AssignmentNode(this, "assignment", true));
                 break;
             case 2:
-                this.children.add(new PrintNode(this, "print",true));
+                this.children.add(new PrintNode(this, "print", true));
                 break;
         }
     }

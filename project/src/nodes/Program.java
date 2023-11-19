@@ -15,6 +15,7 @@ public class Program extends Node {
         this.root = this;
         this.maxDepth = maxDepth;
         this.variables = new ArrayList<>();
+        this.generateChildren();
     }
 
     @Override

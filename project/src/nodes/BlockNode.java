@@ -19,7 +19,12 @@ public class BlockNode extends Node {
     }
 
     @Override
-    public String toString() {
-        return null;  // TODO: implement
+    public String toString() {  // TODO: make this better, indents
+        StringBuilder text = new StringBuilder();
+        text.append("{\n");
+        for (Node child : children)
+            text.append(child.toString());
+        text.append("}\n");
+        return text.toString();
     }
 }

@@ -8,6 +8,7 @@ public class WhileNode extends Node {
     public WhileNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
         this.minDepth = 2;
+        generateChildren();
     }
 
     @Override
@@ -18,7 +19,10 @@ public class WhileNode extends Node {
     }
 
     @Override
-    public String toString() {
-        return null;
+    public String toString() { // TODO: make this better, indents
+        StringBuilder text = new StringBuilder();
+        for (Node child : children)
+            text.append(child.toString());
+        return text.toString();
     }
 }

@@ -8,12 +8,13 @@ public class LineNode extends Node{
 
     public LineNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
+        generateChildren();
     }
 
     @Override
     public void generateChildren() {
         Random random = new Random();
-        switch (random.nextInt(5)){
+        switch (random.nextInt(4)){
             case 0:
                 children.add(new StatementNode(this, "instruction", true));
                 break;
@@ -31,7 +32,7 @@ public class LineNode extends Node{
 
     @Override
     public String toString() {
-        return null;
+        return this.children.get(0).toString();
     }
 
 }
