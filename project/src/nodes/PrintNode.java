@@ -1,13 +1,11 @@
 package nodes;
 
 import base.Node;
-import nodes.ExprNode;
 
 public class PrintNode extends Node {
     public PrintNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
         this.minDepth = 1;
-        generateChildren();
     }
 
     @Override

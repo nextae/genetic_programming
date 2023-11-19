@@ -2,13 +2,11 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class IfNode extends Node {
     public IfNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
         this.minDepth = 3;
-        generateChildren();
     }
 
     @Override

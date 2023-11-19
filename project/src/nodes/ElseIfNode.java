@@ -8,7 +8,6 @@ public class ElseIfNode extends Node {
     public ElseIfNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
         this.minDepth = 2;
-        generateChildren();
     }
     @Override
     public void generateChildren() {

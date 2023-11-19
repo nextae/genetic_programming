@@ -8,7 +8,6 @@ public class LineNode extends Node{
 
     public LineNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        generateChildren();
     }
 
     @Override

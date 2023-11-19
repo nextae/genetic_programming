@@ -2,13 +2,11 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class WhileNode extends Node {
     public WhileNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
         this.minDepth = 2;
-        generateChildren();
     }
 
     @Override

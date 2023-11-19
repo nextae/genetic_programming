@@ -8,7 +8,6 @@ public class DeclarationNode extends Node {
     public DeclarationNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
         this.minDepth = 1;
-        generateChildren();
     }
 
     @Override

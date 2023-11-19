@@ -8,7 +8,6 @@ public class AssignmentNode extends Node {
     public AssignmentNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
         this.minDepth = 1;
-        generateChildren();
     }
 
     @Override

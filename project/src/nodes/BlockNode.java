@@ -7,7 +7,6 @@ public class BlockNode extends Node {
     public BlockNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
         this.minDepth = 1;
-        this.generateChildren();
     }
 
     @Override

@@ -29,6 +29,7 @@ public abstract class Node {
         this.children = new ArrayList<>();
         this.depth = parent.depth + 1;
         this.root = parent.root;
+        generateChildren();
     }
 
     public abstract void generateChildren();
