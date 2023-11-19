@@ -2,6 +2,6 @@ import nodes.Program;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(new Program(10));
+        System.out.println(new Program(5));
     }
 }

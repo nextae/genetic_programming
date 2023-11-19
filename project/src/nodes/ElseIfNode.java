@@ -12,7 +12,10 @@ public class ElseIfNode extends Node {
     @Override
     public void generateChildren() {
         Random random = new Random();
-        switch (random.nextInt(3)){
+        int nextInt;
+        if(root.maxDepth - this.depth <= 1) nextInt = random.nextInt(2);
+        else nextInt = random.nextInt(3);
+        switch (nextInt){
             case 0: // Only one block to if // min depth 1
                 this.children.add(new BlockNode(this, "if_block", true));
                 break;
