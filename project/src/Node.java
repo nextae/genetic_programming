@@ -2,12 +2,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Node {
-    Node parent;
-    String name;
-    List<Node> children;
-    boolean canBeCrossed;
-    int depth;
-    int minDepth;
+    protected Node parent;
+    protected Program root;
+    protected String name;
+    protected List<Node> children;
+    protected boolean canBeCrossed;
+    protected int depth;
+    protected int minDepth;
+
+    public Node() {
+        this.parent = this;
+        this.name = "root";
+        this.canBeCrossed = false;
+        this.children = new ArrayList<>();
+        this.depth = 0;
+    }
 
     public Node(Node parent, String name, boolean canBeCrossed) {
         this.parent = parent;
@@ -15,14 +24,9 @@ public abstract class Node {
         this.canBeCrossed = canBeCrossed;
         this.children = new ArrayList<>();
         this.depth = parent.depth + 1;
+        this.root = parent.root;
     }
 
     public abstract void generateChildren();
-    public String getText() {
-        StringBuilder text = new StringBuilder();
-        for (Node child : children)
-            text.append(child.getText());
-
-        return text.toString();
-    }
+    public abstract String getText();
 }
