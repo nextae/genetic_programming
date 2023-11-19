@@ -14,16 +14,16 @@ public class StatementNode extends Node {
     public void generateChildren() {
         Random random = new Random();
         switch (random.nextInt(3)){
-            case 0:
+            case 0: // min depth 1
                 this.children.add(new DeclarationNode(this, "declaration", true));
                 break;
-            case 1:
+            case 1: // min depth 1
                 if (this.root.variables.isEmpty())
                     this.children.add(new DeclarationNode(this, "declaration", true));
                 else
                     this.children.add(new AssignmentNode(this, "assignment", true));
                 break;
-            case 2:
+            case 2: // min depth 1
                 this.children.add(new PrintNode(this, "print", true));
                 break;
         }

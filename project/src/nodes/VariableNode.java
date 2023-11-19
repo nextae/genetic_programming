@@ -5,7 +5,7 @@ import base.Node;
 public class VariableNode extends Node {
     public VariableNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 2;  // ?
+        this.minDepth = 0;
     }
 
     @Override
