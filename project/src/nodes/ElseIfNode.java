@@ -15,15 +15,23 @@ public class ElseIfNode extends Node {
         switch (random.nextInt(3)){
             case 0: // Only one block to if
                 this.children.add(new BlockNode(this, "if_block", true));
+                break;
             case 1: // Unconditional else
                 this.children.add(new BlockNode(this, "if_block", true));
                 this.children.add(new Token(this, "else_token", "else "));
                 this.children.add(new BlockNode(this, "else_block", true));
+                break;
             case 2: // ElseIf
                 this.children.add(new BlockNode(this, "if_block", true));
                 this.children.add(new Token(this, "else_token", "else "));
                 this.children.add(new IfNode(this, "elseIf_block", true));
+                break;
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return null;
     }
 }

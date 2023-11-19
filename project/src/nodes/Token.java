@@ -1,3 +1,7 @@
+package nodes;
+
+import base.Node;
+
 public class Token extends Node {
     String token;
 
@@ -11,7 +15,7 @@ public class Token extends Node {
     public void generateChildren() {}
 
     @Override
-    public String getText() {
+    public String toString() {
         return token;
     }
 }

@@ -1,3 +1,7 @@
+package base;
+
+import nodes.Program;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,5 +32,5 @@ public abstract class Node {
     }
 
     public abstract void generateChildren();
-    public abstract String getText();
+    public abstract String toString();
 }

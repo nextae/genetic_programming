@@ -16,4 +16,9 @@ public class IfNode extends Node {
         this.children.add(new ExprNode(this, "if_condition", true));
         this.children.add(new ElseIfNode(this, "else_if_block", true));
     }
+
+    @Override
+    public String toString() {
+        return null;
+    }
 }

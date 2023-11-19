@@ -16,13 +16,22 @@ public class LineNode extends Node{
         switch (random.nextInt(5)){
             case 0:
                 children.add(new StatementNode(this, "instruction", true));
+                break;
             case 1:
                 children.add(new BlockNode(this, "code_block", true));
+                break;
             case 2:
                 children.add(new IfNode(this, "if_block",true));
+                break;
             case 3:
                 children.add(new WhileNode(this, "while_block", true));
+                break;
         }
+    }
+
+    @Override
+    public String toString() {
+        return null;
     }
 
 }

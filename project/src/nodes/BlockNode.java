@@ -13,10 +13,13 @@ public class BlockNode extends Node {
     @Override
     public void generateChildren() {
         Random random = new Random();
-        this.children.add(new Token(this, "block_open", "{\n"));
-        while(random.nextInt(2) != 0){
+        while (random.nextInt(2) != 0) {
             this.children.add(new LineNode(this, "block_instruction", true));
         }
-        this.children.add(new Token(this, "block_close", "}\n"));
+    }
+
+    @Override
+    public String toString() {
+        return null;  // TODO: implement
     }
 }

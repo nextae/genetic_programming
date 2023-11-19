@@ -12,9 +12,13 @@ public class WhileNode extends Node {
 
     @Override
     public void generateChildren() {
-        Random random = new Random();
         this.children.add(new Token(this, "while_token", "while "));
         this.children.add(new ExprNode(this, "while_condition", true));
         this.children.add(new BlockNode(this, "while_block", true));
+    }
+
+    @Override
+    public String toString() {
+        return null;
     }
 }
