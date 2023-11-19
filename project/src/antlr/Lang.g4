@@ -76,7 +76,7 @@ expr //Things with (in theory) value behind them
     | expr ('==' | '!=' | '>'
           | '<' | '>=' | '<=') expr # Compare //
     | expr ('and' | 'or') expr      # Combination //
-    | ('!' | 'not') expr            # Negation //
+    | '!' expr                      # Negation //
     | val                           # Value //
     | stdin                         # Input
     ;
