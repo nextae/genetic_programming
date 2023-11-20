@@ -17,7 +17,7 @@ public class ElseIfNode extends Node {
         else nextInt = random.nextInt(3);
         switch (nextInt){
             case 0: // Only one block to if // min depth 1
-                this.children.add(new BlockNode(this, "if_block", true));
+                this.children.add(new BlockNode(this, "if_block_last", true));
                 break;
             case 1: // Unconditional else // min depth 1
                 this.children.add(new BlockNode(this, "if_block", true));
@@ -34,7 +34,7 @@ public class ElseIfNode extends Node {
     }
 
     @Override
-    public String toString() { // TODO: make this better, indents
+    public String toString() {
         StringBuilder text = new StringBuilder();
         for (Node child : children)
             text.append(child.toString());

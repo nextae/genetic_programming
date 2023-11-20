@@ -18,12 +18,15 @@ public class BlockNode extends Node {
     }
 
     @Override
-    public String toString() {  // TODO: make this better, indents
+    public String toString() {
         StringBuilder text = new StringBuilder();
         text.append("{\n");
+
         for (Node child : children)
-            text.append(child.toString());
-        text.append("}\n");
+            text.append("    ".repeat(child.indent)).append(child);
+
+        if(this.name.equals("if_block")) text.append("    ".repeat(this.indent)).append("} ");
+        else text.append("    ".repeat(this.indent)).append("}\n");
         return text.toString();
     }
 }
