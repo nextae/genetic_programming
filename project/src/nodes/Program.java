@@ -21,8 +21,9 @@ public class Program extends Node {
     @Override
     public void generateChildren() {
         Random random = new Random();
-
-        while(random.nextInt(4) != 0) {
+        this.children.add(new LineNode(this, "line", true));
+        this.children.add(new LineNode(this, "line", true));
+        while(random.nextInt(5) != 0) {
             this.children.add(new LineNode(this, "line", true));
         }
     }

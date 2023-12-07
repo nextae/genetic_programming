@@ -8,9 +8,9 @@ import java.util.List;
 
 public abstract class Node {
     public Node parent;
-    protected Program root;
+    public Program root;
     protected String name;
-    protected List<Node> children;
+    public List<Node> children;
     protected boolean canBeCrossed;
     protected int depth;
     protected int minDepth;

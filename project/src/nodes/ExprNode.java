@@ -13,12 +13,17 @@ public class ExprNode extends Node {
     public void generateChildren() {
         Random random = new Random();
         int nextInt;
-        if(root.maxDepth - this.depth < 1) nextInt = random.nextInt(2);
-        else if (root.maxDepth - this.depth == 1) nextInt = random.nextInt(5);
-        else nextInt = random.nextInt(6);
+        int lowerBound = 0;
+
+        if(root.variables.isEmpty()) lowerBound = 1;
+        if(root.maxDepth - this.depth < 1) nextInt = random.nextInt(lowerBound,2);
+        else if (root.maxDepth - this.depth == 1) nextInt = random.nextInt(lowerBound,5);
+        else nextInt = random.nextInt(lowerBound,6);
+
         switch (nextInt){
             case 0: // varname // min depth 0
-                this.children.add(new VariableNode(this, "expr_varname", true));
+                String variable = this.root.variables.get(random.nextInt(this.root.variables.size()));
+                this.children.add(new VariableNode(this, variable, true));
                 break;
             case 1: // min depth 0
                 this.children.add(new ValueNode(this, "expr_value", true));

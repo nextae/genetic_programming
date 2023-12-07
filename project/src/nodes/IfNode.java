@@ -17,7 +17,7 @@ public class IfNode extends Node {
     }
 
     @Override
-    public String toString() { // TODO: make this better, indents
+    public String toString() {
         StringBuilder text = new StringBuilder();
         for (Node child : children)
             text.append(child.toString());
