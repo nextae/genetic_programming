@@ -7,6 +7,7 @@ import interpreter.expression.blocks.Block;
 import interpreter.expression.blocks.ElseIfBlock;
 import interpreter.expression.blocks.IfBlock;
 import interpreter.expression.blocks.WhileBlock;
+import interpreter.expression.library.Input;
 import interpreter.expression.library.Print;
 import interpreter.expression.logic.Combination;
 import interpreter.expression.logic.Comparison;
@@ -196,5 +197,12 @@ public final class AntlrToExpression extends HelloBaseVisitor<Line> {
 
         semanticErrors.add("Error: wrong print function ("+ctx.LBRACKET().getSymbol().getLine()+")"); //I guess
         return new Print(null, null);
+    }
+
+    @Override
+    public Line visitInput(HelloParser.InputContext ctx) {
+        if(ctx.getChild(0) instanceof HelloParser.StdinContext std){
+            return new Input(std.LBRACKET().getSymbol());
+        } else throw new RuntimeException("Problem with input - this shouldn't happen");
     }
 }

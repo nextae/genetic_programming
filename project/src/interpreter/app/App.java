@@ -15,6 +15,9 @@ import java.util.List;
 
 public final class App {
     public static void main(String[] args) {
+        String inputFilePath = "C:\\Users\\LZ\\Desktop\\test_input.txt";
+        String inputDelimeter = " ";
+        
         if(args.length != 1){
             System.err.println("Error: no filename given");
         } else {
@@ -26,7 +29,7 @@ public final class App {
             Program prog = progVisitor.visit(antlrAST);
 
             if(progVisitor.semanticErrors.isEmpty()){
-                ExpressionProcessor ep = new ExpressionProcessor(prog.lines);
+                ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputFilePath, inputDelimeter);
                 List<String> evaluations = ep.getEvalResults(null);
                 if(ExpressionProcessor.semanticErrors.isEmpty())
                 for(String eval: evaluations) {

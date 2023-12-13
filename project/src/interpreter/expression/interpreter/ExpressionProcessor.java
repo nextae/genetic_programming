@@ -9,10 +9,9 @@ import interpreter.expression.logic.*;
 import interpreter.expression.toplevel.Line;
 import interpreter.expression.variables.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public final class ExpressionProcessor {
 
@@ -24,8 +23,17 @@ public final class ExpressionProcessor {
     private final Map<String, String> types = new HashMap<>();
 
     private boolean firstRunError = false;
+    private static Scanner scanner;
+    private static File file;
 
-    public ExpressionProcessor(List<Line> lines){
+    public ExpressionProcessor(List<Line> lines, String inputFilePath, String inputDelimeter){
+        ExpressionProcessor.file = new File(inputFilePath);
+        try {
+            ExpressionProcessor.scanner = new Scanner(file);
+            scanner.useDelimiter(inputDelimeter);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("File "+inputFilePath+" not found");
+        }
         list = lines;
         values = new HashMap<>();
     }
@@ -434,6 +442,14 @@ public final class ExpressionProcessor {
                                     <= Float.parseFloat(right.value)));
                 }
             } else semanticErrors.add("Error: comparing non-comparable types! ("+co.token.getLine()+")");
+        } else if (l instanceof Input i){
+            String readValue = "";
+            if (scanner.hasNext()) {
+                readValue = scanner.next();
+            } else {
+                semanticErrors.add("Error: no data left to use as input ("+i.token.getLine()+")");
+            }
+            result = new Value(readValue);
         }
         return result;
     }
