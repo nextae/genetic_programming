@@ -184,15 +184,6 @@ public final class AntlrToExpression extends HelloBaseVisitor<Line> {
             String id = ctx.getChild(2).getText();
             return new Print(id, null, idToken);
         }
-//        else if(ctx.getChild(2) instanceof HelloParser.AdditiveContext ac) {
-//            return new Print(null, (Expr) visitAdditive(ac));
-//        } else if(ctx.getChild(2) instanceof HelloParser.MultiplicativeContext mc){
-//            return new Print(null, (Expr) visitMultiplicative(mc));
-//        } else if(ctx.getChild(2) instanceof HelloParser.PowerContext pc) {
-//            return new Print(null, (Expr) visitPower(pc));
-//        } else if (ctx.getChild(2) instanceof HelloParser.ValueContext s){
-//            return new Print(null, visitValue(s));
-//        }
         else if (ctx.getChild(2) instanceof HelloParser.ExprContext e) return new Print(null, (Expr) visit(e));
 
         semanticErrors.add("Error: wrong print function ("+ctx.LBRACKET().getSymbol().getLine()+")"); //I guess

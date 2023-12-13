@@ -20,11 +20,59 @@ public final class ExpressionProcessor {
     public static final List<String> semanticErrors = new ArrayList<>();
 
     private final Map<String, Value> values;
-    private final Map<String, String> types = new HashMap<>();
+    private final Map<String, String> types;
 
     private boolean firstRunError = false;
     private static Scanner scanner;
     private static File file;
+
+    private Value getBoolean(Value value){
+        if (value.type.equals("bool")) return value;
+        else {
+            float f = Float.parseFloat(value.value);
+            return f>=0?new Value("true"):new Value("false");
+        }
+    }
+
+    private Value getFloat(Value value){
+        if (value.type.equals("float")) return value;
+        else if (value.type.equals("bool")) {
+            return value.value.equals("true")?new Value("1.0"):new Value("-1.0");
+        } else {
+            return new Value(String.valueOf(Float.parseFloat(value.value)));
+        }
+    }
+
+    private Value getInt(Value value){
+        if (value.type.equals("int")) return value;
+        else if (value.type.equals("bool")) {
+            return value.value.equals("true")?new Value("1"):new Value("-1");
+        } else {
+            return new Value(String.valueOf(Math.round(Float.parseFloat(value.value))));
+        }
+    }
+
+    private Value castToLeftType(Value left, Value right){
+        Value rightCasted;
+        switch (left.type){
+            case "int" -> rightCasted = getInt(right);
+            case "float" -> rightCasted = getFloat(right);
+            case "bool" -> rightCasted = getBoolean(right);
+            default -> rightCasted = new Value(""); // Should never go to default
+        }
+        return rightCasted;
+    }
+
+    private Value castToLeftType(String left_type, Value right){
+        Value rightCasted;
+        switch (left_type){
+            case "int" -> rightCasted = getInt(right);
+            case "float" -> rightCasted = getFloat(right);
+            case "bool" -> rightCasted = getBoolean(right);
+            default -> rightCasted = new Value(""); // Should never go to default
+        }
+        return rightCasted;
+    }
 
     public ExpressionProcessor(List<Line> lines, String inputFilePath, String inputDelimeter){
         ExpressionProcessor.file = new File(inputFilePath);
@@ -36,11 +84,13 @@ public final class ExpressionProcessor {
         }
         list = lines;
         values = new HashMap<>();
+        types = new HashMap<>();
     }
 
     public ExpressionProcessor(List<Line> lines, ExpressionProcessor parent){
         list = lines;
-        values = new HashMap<>();
+        this.values = parent.values;
+        this.types = parent.types;
         this.parent = parent;
     }
 
@@ -74,7 +124,7 @@ public final class ExpressionProcessor {
                         e.printStackTrace();
                     }
                 } else if (l instanceof VarDeclaration v){
-                    Value value = eval(v.variable.value);
+                    Value value = castToLeftType(v.variable.type, eval(v.variable.value));
                     //FIXME: Below is commented only because
                     // of implementation of two-run variable checking, uncomment when removed
 //                if(values.containsKey(v.variable.id))
@@ -87,7 +137,11 @@ public final class ExpressionProcessor {
                     else if(!types.get(v.variable.id).equals(value.type) && !value.type.equals("notInit"))
                         semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
                 } else if (l instanceof Assignment a){
-                    Value value = eval(a.expr);
+                    String idType = "";
+                    if(!values.containsKey(a.id)){
+                        if(parent != null) idType = parent.types.get(a.id);
+                    } else idType = types.get(a.id);
+                    Value value = castToLeftType(idType, eval(a.expr));
                     if(!values.containsKey(a.id)){
                         if(parent != null && parent.values.containsKey(a.id)) {
                             parent.values.put(a.id, value);
@@ -99,9 +153,6 @@ public final class ExpressionProcessor {
                         values.put(a.id, value);
                         if (!types.get(a.id).equals(value.type))
                             semanticErrors.add("Error: mismatched types! ("+a.token.getLine()+")");
-//                        else if (values.get(a.id) == null)
-//                            semanticErrors.add("Error: variable `"+a.id+"` not initialized ("+a.token.getLine()+")");
-                        //Why is this here?
                     }
                 } else if (l instanceof Print p){
                     if(p.id != null) {
@@ -114,24 +165,12 @@ public final class ExpressionProcessor {
                         evaluations.add(eval(p.expr).toString());
                     }
                 } else if (l instanceof WhileBlock w){
-                    Value condition = eval(w.condition);
+                    Value condition = getBoolean(eval(w.condition));
                     if(condition.type.equals("notInit"))
                         semanticErrors.add("Error: not initialized value ("+w.token.getLine()+")");
                     else if(!condition.type.equals("bool"))
                         semanticErrors.add("Error: can't resolve truth-value for given condition ("+w.token.getLine()+")");
                     else if(condition.value.equals("true")){
-//                        try{
-//                            List<Line> whileList = new ArrayList<>();
-//                            whileList.add(w.block);
-//                            whileList.add(w);
-//                            evaluations.addAll(getEvalResults(whileList));
-//                            whileList.clear();
-//                        } catch (Error e){
-////                            e.printStackTrace();
-//                            semanticErrors.add("Error: stack overflow! (loop repeats too many times)");
-//                            break;
-//                        }
-
                         List<Line> whileList = new ArrayList<>();
                         whileList.add(w.block);
                         while(condition.value.equals("true")){
@@ -140,7 +179,7 @@ public final class ExpressionProcessor {
                         }
                     }
                 } else if (l instanceof IfBlock i){
-                    Value condition = eval(i.condition);
+                    Value condition = getBoolean(eval(i.condition));
                     if(condition.type.equals("notInit"))
                         semanticErrors.add("Error: not initialized value ("+i.token.getLine()+")");
                     else if(!condition.type.equals("bool"))
@@ -178,8 +217,8 @@ public final class ExpressionProcessor {
             Value right = eval(a.right);
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+a.token.getLine()+")");
-            if(left.type.equals(right.type)){
-                if(a.operator.equals("+")){
+            if(left.type.equals(right.type)) {
+                if (a.operator.equals("+")) {
                     switch (left.type) {
                         case "int" -> {
                             int leftInt = Integer.parseInt(left.value);
@@ -191,9 +230,13 @@ public final class ExpressionProcessor {
                             float rightFloat = Float.parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat + rightFloat));
                         }
-                        case "bool" -> semanticErrors.add("Error: So far - can't add booleans! ("+a.token.getLine()+")");
+                        case "bool" -> {
+                            Value leftToInt = getInt(left);
+                            Value rightToInt = getInt(right);
+                            result = getBoolean(eval(new Addition(leftToInt, a.operator, rightToInt, a.token)));
+                        }
                     }
-                } else if(a.operator.equals("-")){
+                } else if (a.operator.equals("-")) {
                     switch (left.type) {
                         case "int" -> {
                             int leftInt = Integer.parseInt(left.value);
@@ -205,18 +248,24 @@ public final class ExpressionProcessor {
                             float rightFloat = Float.parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat - rightFloat));
                         }
-                        case "bool" -> semanticErrors.add("Error: Can't subtract booleans! ("+a.token.getLine()+")");
+                        case "bool" -> {
+                            Value leftToInt = getInt(left);
+                            Value rightToInt = getInt(right);
+                            result = getBoolean(eval(new Addition(leftToInt, a.operator, rightToInt, a.token)));
+                        }
                     }
                 }
-            } else semanticErrors.add("Error: Types don't match! ("+a.token.getLine()+")");
+            } else { // Cast to type of the left expression
+                result = eval(new Addition(left, a.operator, castToLeftType(left, right), a.token));
+            }
 
         } else if (l instanceof Multiplication m){
             Value left = eval(m.left);
             Value right = eval(m.right);
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
-            if(left.type.equals(right.type)){
-                if(m.operator.equals("*")){
+            if(left.type.equals(right.type)) {
+                if (m.operator.equals("*")) {
                     switch (left.type) {
                         case "int" -> {
                             int leftInt = Integer.parseInt(left.value);
@@ -228,9 +277,13 @@ public final class ExpressionProcessor {
                             float rightFloat = Float.parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat * rightFloat));
                         }
-                        case "bool" -> semanticErrors.add("Error: Can't multiply booleans! ("+m.token.getLine()+")");
+                        case "bool" -> {
+                            Value leftToInt = getInt(left);
+                            Value rightToInt = getInt(right);
+                            result = getBoolean(eval(new Multiplication(leftToInt, m.operator, rightToInt, m.token)));
+                        }
                     }
-                } else if(m.operator.equals("/")){
+                } else if (m.operator.equals("/")) {
                     switch (left.type) {
                         case "int" -> {
                             int leftInt = Integer.parseInt(left.value);
@@ -238,7 +291,7 @@ public final class ExpressionProcessor {
                             try {
                                 result = new Value(Integer.toString(leftInt / rightInt));
                             } catch (ArithmeticException e) {
-                                semanticErrors.add("Error: dividing by zero! ("+m.token.getLine()+")");
+                                semanticErrors.add("Error: dividing by zero! (" + m.token.getLine() + ")");
                             }
                         }
                         case "float" -> {
@@ -246,14 +299,20 @@ public final class ExpressionProcessor {
                             float rightFloat = Float.parseFloat(right.value);
                             try {
                                 result = new Value(Float.toString(leftFloat / rightFloat));
-                            } catch (ArithmeticException e){
-                                semanticErrors.add("Error: dividing by zero! ("+m.token.getLine()+")");
+                            } catch (ArithmeticException e) {
+                                semanticErrors.add("Error: dividing by zero! (" + m.token.getLine() + ")");
                             }
                         }
-                        case "bool" -> semanticErrors.add("Error: Can't divide booleans! ("+m.token.getLine()+")");
+                        case "bool" -> {
+                            Value leftToInt = getInt(left);
+                            Value rightToInt = getInt(right);
+                            result = getBoolean(eval(new Multiplication(leftToInt, m.operator, rightToInt, m.token)));
+                        }
                     }
                 }
-            } else semanticErrors.add("Error: Types don't match! ("+m.token.getLine()+")");
+            } else {
+                result = eval(new Multiplication(left, m.operator, castToLeftType(left, right), m.token));
+            }
         } else if (l instanceof Power p){
             Value left = eval(p.left);
             Value right = eval(p.right);
@@ -275,13 +334,19 @@ public final class ExpressionProcessor {
                         double power = Math.pow(leftFloat, rightFloat);
                         result = new Value(Double.toString(power));
                     }
-                    default -> semanticErrors.add("Error: only numeric variables can be exponentiatied ("+p.token.getLine()+")");
+                    case "bool" -> {
+                        Value leftToInt = getInt(left);
+                        Value rightToInt = getInt(right);
+                        result = getBoolean(eval(new Power(leftToInt, rightToInt, p.token)));
+                    }
                 }
             } else if((left.type.equals("float") || left.type.equals("int"))
                     && (right.type.equals("float") || right.type.equals("int"))) {
                 double power = Math.pow(Float.parseFloat(left.value), Float.parseFloat(right.value));
                 result = new Value(Double.toString(power));
-            } else semanticErrors.add("Error: only numeric variables can be exponentiatied ("+p.token.getLine()+")");
+            } else {
+                result = eval(new Power(left, castToLeftType(left, right), p.token));
+            }
         } else if (l instanceof Modulo m) {
             Value left = eval(m.dividend);
             Value right = eval(m.divisor);
@@ -289,47 +354,51 @@ public final class ExpressionProcessor {
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
 
-            if(left.type.equals(right.type)){
-                switch(left.type){
+            if(left.type.equals(right.type)) {
+                switch (left.type) {
                     case "int" -> {
                         Integer leftInt = Integer.parseInt(left.value);
                         Integer rightInt = Integer.parseInt(right.value);
-                        int modulo = leftInt%rightInt;
+                        int modulo = leftInt % rightInt;
                         return new Value(Integer.toString(modulo));
                     }
                     case "float" -> {
                         Float leftFloat = Float.parseFloat(left.value);
                         Float rightFloat = Float.parseFloat(right.value);
-                        float modulo = leftFloat%rightFloat;
+                        float modulo = leftFloat % rightFloat;
                         return new Value(Float.toString(modulo));
                     }
-                    default -> semanticErrors.add("Error: modulo works only for numeric values ("+m.token.getLine()+")");
+                    case "bool" -> {
+                        Value leftToInt = getInt(left);
+                        Value rightToInt = getInt(right);
+                        result = getBoolean(eval(new Modulo(leftToInt, rightToInt, m.token)));
+                    }
                 }
-            } else semanticErrors.add("Error: types don't match ("+m.token.getLine()+")");
+            } else {
+                result = eval(new Modulo(left, castToLeftType(left, right), m.token));
+            }
         } else if (l instanceof Combination cb) {
-            Value left = eval(cb.left);
-            Value right = eval(cb.right);
+            Value left = getBoolean(eval(cb.left));
+            Value right = getBoolean(eval(cb.right));
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+cb.token.getLine()+")");
             if(!(left.type.equals("bool") && right.type.equals("bool")))
-                semanticErrors.add("Error: combining non-bool types! ("+cb.token.getLine()+")");
+                semanticErrors.add("Error: combining non-bool types! ("+cb.token.getLine()+")"); // Should never get here
             else {
                 String operator = cb.operator;
                 String b1 = left.value;
                 String b2 = right.value;
+                boolean B1 = Boolean.parseBoolean(b1);
+                boolean B2 = Boolean.parseBoolean(b2);
                 switch (operator) {
                     case "and" -> {
                         if (!(b1.equals("null") || b2.equals("null"))) {
-                            boolean B1 = Boolean.parseBoolean(b1);
-                            boolean B2 = Boolean.parseBoolean(b2);
                             result = new Value(Boolean.toString(B1 && B2));
                         } else if (b1.equals("false") || b2.equals("false")) result = new Value("false");
                         else result = new Value("null");
                     }
                     case "or" -> {
                         if (!(b1.equals("null") || b2.equals("null"))) {
-                            boolean B1 = Boolean.parseBoolean(b1);
-                            boolean B2 = Boolean.parseBoolean(b2);
                             result = new Value(Boolean.toString(B1 || B2));
                         } else if (b1.equals("true") || b2.equals("true")) result = new Value("true");
                         else result = new Value("null");
@@ -337,7 +406,7 @@ public final class ExpressionProcessor {
                 }
             }
         } else if (l instanceof Negation n) {
-            Value val = eval(n.expr);
+            Value val = getBoolean(eval(n.expr));
             if(val.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+n.token.getLine()+")");
             if(!val.type.equals("bool")) semanticErrors.add("Error: Can't negate non boolean values! ("+n.token.getLine()+")");
@@ -350,98 +419,50 @@ public final class ExpressionProcessor {
             Value left = eval(co.left);
             Value right = eval(co.right);
             String operator = co.operator;
-            List<String> arithmetic = new ArrayList<>();
-            arithmetic.add(">"); arithmetic.add("<"); arithmetic.add(">="); arithmetic.add("<=");
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized ("+co.token.getLine()+")");
             if(left.type.equals(right.type)){
                 switch(left.type){
-                    case "bool" -> {
-                        if(arithmetic.contains(operator))
-                            semanticErrors.add("Error: boolean values can't be compared arithmetically ("+co.token.getLine()+")");
-                        else if(operator.equals("==")) {
-                            if(!(left.value.equals("null") || right.value.equals("null"))) {
-                                boolean b1 = Boolean.parseBoolean(left.value);
-                                boolean b2 = Boolean.parseBoolean(right.value);
-                                result = new Value(Boolean.toString(b1 == b2));
-                            } else result = new Value("null");
-                        }
-                        else if(operator.equals("!=")) {
-                            if(!(left.value.equals("null") || right.value.equals("null"))) {
-                                boolean b1 = Boolean.parseBoolean(left.value);
-                                boolean b2 = Boolean.parseBoolean(right.value);
-                                result = new Value(Boolean.toString(b1 != b2));
-                            } else result = new Value("null");
-                        }
-                    }
-                    case "int" -> {
+                    case "bool", "int" -> {
+                        int leftInt = Integer.parseInt(String.valueOf(getInt(left).value));
+                        int rightInt = Integer.parseInt(String.valueOf(getInt(right).value));
                         switch (operator) {
-                            case "==" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            == Integer.parseInt(right.value)));
-                            case "!=" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            != Integer.parseInt(right.value)));
-                            case ">" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            > Integer.parseInt(right.value)));
-                            case "<" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            < Integer.parseInt(right.value)));
-                            case ">=" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            >= Integer.parseInt(right.value)));
-                            case "<=" ->
-                                    result = new Value(Boolean.toString(Integer.parseInt(left.value)
-                                            <= Integer.parseInt(right.value)));
+                            case "==" -> result = new Value(Boolean.toString(leftInt == rightInt));
+                            case "!=" -> result = new Value(Boolean.toString(leftInt != rightInt));
+                            case ">" -> result = new Value(Boolean.toString(leftInt > rightInt));
+                            case "<" -> result = new Value(Boolean.toString(leftInt < rightInt));
+                            case ">=" -> result = new Value(Boolean.toString(leftInt >= rightInt));
+                            case "<=" -> result = new Value(Boolean.toString(leftInt <= rightInt));
                         }
                     }
                     case "float" -> {
+                        float leftFloat = Float.parseFloat(String.valueOf(getFloat(left).value));
+                        float rightFloat = Float.parseFloat(String.valueOf(getFloat(right).value));
                         switch (operator) {
-                            case "==" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            == Float.parseFloat(right.value)));
-                            case "!=" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            != Float.parseFloat(right.value)));
-                            case ">" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            > Float.parseFloat(right.value)));
-                            case "<" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            < Float.parseFloat(right.value)));
-                            case ">=" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            >= Float.parseFloat(right.value)));
-                            case "<=" ->
-                                    result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                            <= Float.parseFloat(right.value)));
+                            case "==" -> result = new Value(Boolean.toString(leftFloat == rightFloat));
+                            case "!=" -> result = new Value(Boolean.toString(leftFloat != rightFloat));
+                            case ">" -> result = new Value(Boolean.toString(leftFloat > rightFloat));
+                            case "<" -> result = new Value(Boolean.toString(leftFloat < rightFloat));
+                            case ">=" -> result = new Value(Boolean.toString(leftFloat >= rightFloat));
+                            case "<=" -> result = new Value(Boolean.toString(leftFloat <= rightFloat));
                         }
                     }
                 }
             } else if((left.type.equals("float") || left.type.equals("int"))
                     && (right.type.equals("float") || right.type.equals("int"))) {
+                float leftFloat = Float.parseFloat(String.valueOf(getFloat(left).value));
+                float rightFloat = Float.parseFloat(String.valueOf(getFloat(right).value));
                 switch (operator) {
-                    case "==" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    == Float.parseFloat(right.value)));
-                    case "!=" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    != Float.parseFloat(right.value)));
-                    case ">" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    > Float.parseFloat(right.value)));
-                    case "<" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    < Float.parseFloat(right.value)));
-                    case ">=" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    >= Float.parseFloat(right.value)));
-                    case "<=" ->
-                            result = new Value(Boolean.toString(Float.parseFloat(left.value)
-                                    <= Float.parseFloat(right.value)));
+                    case "==" -> result = new Value(Boolean.toString(leftFloat == rightFloat));
+                    case "!=" -> result = new Value(Boolean.toString(leftFloat != rightFloat));
+                    case ">" -> result = new Value(Boolean.toString(leftFloat > rightFloat));
+                    case "<" -> result = new Value(Boolean.toString(leftFloat < rightFloat));
+                    case ">=" -> result = new Value(Boolean.toString(leftFloat >= rightFloat));
+                    case "<=" -> result = new Value(Boolean.toString(leftFloat <= rightFloat));
                 }
-            } else semanticErrors.add("Error: comparing non-comparable types! ("+co.token.getLine()+")");
+            } else {
+                result = eval(new Comparison(left, co.operator, castToLeftType(left, right), co.token));
+            }
         } else if (l instanceof Input i){
             String readValue = "";
             if (scanner.hasNext()) {
