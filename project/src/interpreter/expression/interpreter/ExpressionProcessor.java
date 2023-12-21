@@ -178,14 +178,14 @@ public final class ExpressionProcessor {
                     }
                 } else if (l instanceof Print p) {
                     if (p.id != null) {
-                        Value result = eval(new VarName(p.id, p.token));
+                        Value result = getInt(eval(new VarName(p.id, p.token)));
                         if (result == null)
                             semanticErrors.add("Error: variable " + p.id + " not declared (" + p.token.getLine() + ")");
                         else if (result.type.equals("notInit"))
                             semanticErrors.add("Error: variable `" + p.id + "` not initialized (" + p.token.getLine() + ")");
                         else evaluations.add(result.toString());
                     } else {
-                        evaluations.add(eval(p.expr).toString());
+                        evaluations.add(getInt(eval(p.expr)).toString());
                     }
                 } else if (l instanceof WhileBlock w) {
                     Value condition = getBoolean(eval(w.condition));
