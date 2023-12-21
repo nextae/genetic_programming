@@ -25,31 +25,49 @@ public final class ExpressionProcessor {
     private boolean firstRunError = false;
     private static Scanner scanner;
     private static File file;
+    private static final int maxInstructions = 100;
+    private static int computedInstructions = 0;
 
     private Value getBoolean(Value value){
-        if (value.type.equals("bool")) return value;
+        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
+        else if (value.type.equals("bool")) return value;
         else {
             float f = Float.parseFloat(value.value);
             return f>=0?new Value("true"):new Value("false");
         }
+        return new Value("false");
     }
 
     private Value getFloat(Value value){
-        if (value.type.equals("float")) return value;
-        else if (value.type.equals("bool")) {
-            return value.value.equals("true")?new Value("1.0"):new Value("-1.0");
-        } else {
-            return new Value(String.valueOf(Float.parseFloat(value.value)));
+        switch (value.type) {
+            case "notInit" -> semanticErrors.add("Error: variable not declared");
+            case "float" -> {
+                return value;
+            }
+            case "bool" -> {
+                return value.value.equals("true") ? new Value("1.0") : new Value("-1.0");
+            }
+            default -> {
+                return new Value(String.valueOf(Float.parseFloat(value.value)));
+            }
         }
+        return new Value("0.0");
     }
 
     private Value getInt(Value value){
-        if (value.type.equals("int")) return value;
-        else if (value.type.equals("bool")) {
-            return value.value.equals("true")?new Value("1"):new Value("-1");
-        } else {
-            return new Value(String.valueOf(Math.round(Float.parseFloat(value.value))));
+        switch (value.type) {
+            case "notInit" -> semanticErrors.add("Error: variable not declared");
+            case "int" -> {
+                return value;
+            }
+            case "bool" -> {
+                return value.value.equals("true") ? new Value("1") : new Value("-1");
+            }
+            default -> {
+                return new Value(String.valueOf(Math.round(Float.parseFloat(value.value))));
+            }
         }
+        return new Value("0");
     }
 
     private Value castToLeftType(Value left, Value right){
@@ -104,6 +122,8 @@ public final class ExpressionProcessor {
 
         if(list == null)list = this.list;
         for(Line l: list){
+            computedInstructions++;
+            if(computedInstructions >= maxInstructions) break;
             if(l instanceof VarDeclaration v){
                 if(values.containsKey(v.variable.id)) {
                     semanticErrors.add("Error: variable `" + v.variable.id + "` " +
@@ -114,92 +134,100 @@ public final class ExpressionProcessor {
                 types.put(v.variable.id, v.variable.type);
             }
         }
-        if(!firstRunError)
-            for(Line l: list){
-                if(l instanceof Variable v){
+        if(!firstRunError) {
+            for (Line l : list) {
+                computedInstructions++;
+                if(computedInstructions >= maxInstructions) break;
+                if (l instanceof Variable v) {
                     System.out.println("OH-OH! variable value: " + v.value);
                     try {
                         values.put(v.id, eval(v.value));
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
-                } else if (l instanceof VarDeclaration v){
+                } else if (l instanceof VarDeclaration v) {
                     Value value = castToLeftType(v.variable.type, eval(v.variable.value));
                     //FIXME: Below is commented only because
                     // of implementation of two-run variable checking, uncomment when removed
 //                if(values.containsKey(v.variable.id))
 //                    semanticErrors.add("Error: variable `"+v.variable.id+"` already declared ("+v.variable.token.getLine()+")");
                     values.put(v.variable.id, value);
+                    //NOTE: No longer needed since we are casting to left type it will always match
 //                    types.put(v.variable.id, v.variable.type);
-                    if(v.variable.value instanceof VarName vn && types.containsKey(vn.id) && !types.get(vn.id).equals(types.get(v.variable.id)))
-                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
+//                    if (v.variable.value instanceof VarName vn && types.containsKey(vn.id) && !types.get(vn.id).equals(types.get(v.variable.id)))
+//                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
                         // Checks if declared types match ^
-                    else if(!types.get(v.variable.id).equals(value.type) && !value.type.equals("notInit"))
-                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
-                } else if (l instanceof Assignment a){
+//                    else if (!types.get(v.variable.id).equals(value.type) && !value.type.equals("notInit"))
+//                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
+                } else if (l instanceof Assignment a) {
                     String idType = "";
-                    if(!values.containsKey(a.id)){
-                        if(parent != null) idType = parent.types.get(a.id);
+                    if (!values.containsKey(a.id)) {
+                        if (parent != null) idType = parent.types.get(a.id);
                     } else idType = types.get(a.id);
                     Value value = castToLeftType(idType, eval(a.expr));
-                    if(!values.containsKey(a.id)){
-                        if(parent != null && parent.values.containsKey(a.id)) {
+                    if (!values.containsKey(a.id)) {
+                        if (parent != null && parent.values.containsKey(a.id)) {
                             parent.values.put(a.id, value);
-                            if(!parent.types.get(a.id).equals(value.type))
-                                semanticErrors.add("Error: mismatched types! ("+a.token.getLine()+")");
-                        }
-                        else semanticErrors.add("Error: variable `"+a.id+"` not declared ("+a.token.getLine()+")");
+                            //NOTE: No longer needed since we are casting to left type it will always match
+//                            if (!parent.types.get(a.id).equals(value.type))
+//                                semanticErrors.add("Error: mismatched types! (" + a.token.getLine() + ")");
+                        } else
+                            semanticErrors.add("Error: variable `" + a.id + "` not declared (" + a.token.getLine() + ")");
                     } else {
                         values.put(a.id, value);
-                        if (!types.get(a.id).equals(value.type))
-                            semanticErrors.add("Error: mismatched types! ("+a.token.getLine()+")");
+                        //NOTE: No longer needed since we are casting to left type it will always match
+//                        if (!types.get(a.id).equals(value.type))
+//                            semanticErrors.add("Error: mismatched types! (" + a.token.getLine() + ")");
                     }
-                } else if (l instanceof Print p){
-                    if(p.id != null) {
+                } else if (l instanceof Print p) {
+                    if (p.id != null) {
                         Value result = eval(new VarName(p.id, p.token));
-                        if(result == null) semanticErrors.add("Error: variable "+p.id+" not declared ("+p.token.getLine()+")");
-                        else if(result.type.equals("notInit"))
-                            semanticErrors.add("Error: variable `"+p.id+"` not initialized ("+p.token.getLine()+")");
+                        if (result == null)
+                            semanticErrors.add("Error: variable " + p.id + " not declared (" + p.token.getLine() + ")");
+                        else if (result.type.equals("notInit"))
+                            semanticErrors.add("Error: variable `" + p.id + "` not initialized (" + p.token.getLine() + ")");
                         else evaluations.add(result.toString());
                     } else {
                         evaluations.add(eval(p.expr).toString());
                     }
-                } else if (l instanceof WhileBlock w){
+                } else if (l instanceof WhileBlock w) {
                     Value condition = getBoolean(eval(w.condition));
-                    if(condition.type.equals("notInit"))
-                        semanticErrors.add("Error: not initialized value ("+w.token.getLine()+")");
-                    else if(!condition.type.equals("bool"))
-                        semanticErrors.add("Error: can't resolve truth-value for given condition ("+w.token.getLine()+")");
-                    else if(condition.value.equals("true")){
+                    if (condition.type.equals("notInit"))
+                        semanticErrors.add("Error: not initialized value (" + w.token.getLine() + ")");
+                    else if (!condition.type.equals("bool"))
+                        semanticErrors.add("Error: can't resolve truth-value for given condition (" + w.token.getLine() + ")");
+                    else if (condition.value.equals("true")) {
                         List<Line> whileList = new ArrayList<>();
                         whileList.add(w.block);
-                        while(condition.value.equals("true")){
+                        while (condition.value.equals("true") && computedInstructions <= maxInstructions) {
+                            computedInstructions++;
                             evaluations.addAll(getEvalResults(whileList));
                             condition = eval(w.condition);
                         }
                     }
-                } else if (l instanceof IfBlock i){
+                } else if (l instanceof IfBlock i) {
                     Value condition = getBoolean(eval(i.condition));
-                    if(condition.type.equals("notInit"))
-                        semanticErrors.add("Error: not initialized value ("+i.token.getLine()+")");
-                    else if(!condition.type.equals("bool"))
-                        semanticErrors.add("Error: can't resolve truth-value for given condition ("+i.token.getLine()+")");
-                    else if (condition.value.equals("true")){
+                    if (condition.type.equals("notInit"))
+                        semanticErrors.add("Error: not initialized value (" + i.token.getLine() + ")");
+                    else if (!condition.type.equals("bool"))
+                        semanticErrors.add("Error: can't resolve truth-value for given condition (" + i.token.getLine() + ")");
+                    else if (condition.value.equals("true")) {
                         ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.ifBlock.lines, this);
                         evaluations.addAll(ep.getEvalResults(null));
-                    } else if (condition.value.equals("false") && i.elseBlock.elseBlock != null){
+                    } else if (condition.value.equals("false") && i.elseBlock.elseBlock != null) {
                         ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.elseBlock.lines, this);
                         evaluations.addAll(ep.getEvalResults(null));
-                    } else if (condition.value.equals("false") && i.elseBlock.child != null){
+                    } else if (condition.value.equals("false") && i.elseBlock.child != null) {
                         List<Line> childList = new ArrayList<>();
                         childList.add(i.elseBlock.child);
                         evaluations.addAll(getEvalResults(childList));
                     }
-                } else if (l instanceof Block b){
+                } else if (l instanceof Block b) {
                     ExpressionProcessor ep = new ExpressionProcessor(b.lines, this);
                     evaluations.addAll(ep.getEvalResults(null));
                 }
             }
+        }
         return evaluations;
     }
 
