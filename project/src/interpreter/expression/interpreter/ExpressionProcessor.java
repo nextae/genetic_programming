@@ -84,6 +84,7 @@ public final class ExpressionProcessor {
 
     private Value castToLeftType(Value left, Value right){
         Value rightCasted;
+        if (left.type == null || right.type == null) return new Value("");
         switch (left.type){
             case "int" -> rightCasted = getInt(right);
             case "float" -> rightCasted = getFloat(right);
@@ -95,7 +96,7 @@ public final class ExpressionProcessor {
 
     private Value castToLeftType(String left_type, Value right){
         Value rightCasted;
-        if (left_type == null) return new Value("");
+        if (left_type == null || right.type == null) return new Value("");
         switch (left_type){
             case "int" -> rightCasted = getInt(right);
             case "float" -> rightCasted = getFloat(right);
