@@ -2,17 +2,14 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class StatementNode extends Node {
     public StatementNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 1;
     }
 
     @Override
     public void generateChildren() {
-        Random random = new Random();
         switch (random.nextInt(3)){
             case 0: // min depth 1
                 this.children.add(new DeclarationNode(this, "declaration", true));

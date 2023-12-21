@@ -2,17 +2,13 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
-
 public class AssignmentNode extends Node {
     public AssignmentNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 1;
     }
 
     @Override
     public void generateChildren() {
-        Random random = new Random();
         String variable = this.root.variables.get(random.nextInt(this.root.variables.size()));
 
         this.children.add(new VariableNode(this, variable, true));

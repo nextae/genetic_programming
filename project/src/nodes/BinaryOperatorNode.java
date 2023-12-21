@@ -2,7 +2,6 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class BinaryOperatorNode extends Node {
 
@@ -10,12 +9,10 @@ public class BinaryOperatorNode extends Node {
 
     public BinaryOperatorNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 0;
     }
 
     @Override
     public void generateChildren() {
-        Random random = new Random();
         switch (random.nextInt(14)){
             case 0:
                 this.operator = " + ";

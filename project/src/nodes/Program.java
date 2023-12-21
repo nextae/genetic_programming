@@ -4,7 +4,6 @@ import base.Node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Program extends Node {
     public int maxDepth;
@@ -20,7 +19,6 @@ public class Program extends Node {
 
     @Override
     public void generateChildren() {
-        Random random = new Random();
         this.children.add(new LineNode(this, "line", true));
         this.children.add(new LineNode(this, "line", true));
         while(random.nextInt(5) != 0) {

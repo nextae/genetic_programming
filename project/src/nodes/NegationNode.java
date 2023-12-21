@@ -5,7 +5,6 @@ import base.Node;
 public class NegationNode extends Node {
     public NegationNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 2;
     }
     @Override
     public void generateChildren() {

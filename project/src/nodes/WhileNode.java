@@ -6,7 +6,6 @@ import base.Node;
 public class WhileNode extends Node {
     public WhileNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
-        this.minDepth = 2;
     }
 
     @Override
@@ -17,7 +16,7 @@ public class WhileNode extends Node {
     }
 
     @Override
-    public String toString() { // TODO: make this better, indents
+    public String toString() {
         StringBuilder text = new StringBuilder();
         for (Node child : children)
             text.append(child.toString());

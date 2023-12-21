@@ -2,23 +2,16 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class ExprNode extends Node {
     public ExprNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 1;
     }
     @Override
     public void generateChildren() {
-        Random random = new Random();
-        int nextInt;
         int lowerBound = 0;
-
         if(root.variables.isEmpty()) lowerBound = 1;
-        if(root.maxDepth - this.depth < 1) nextInt = random.nextInt(lowerBound,2);
-        else if (root.maxDepth - this.depth == 1) nextInt = random.nextInt(lowerBound,5);
-        else nextInt = random.nextInt(lowerBound,6);
+        int nextInt = random.nextInt(lowerBound, 6);
 
         switch (nextInt){
             case 0: // varname // min depth 0

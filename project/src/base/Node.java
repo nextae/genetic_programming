@@ -5,6 +5,7 @@ import nodes.Program;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public abstract class Node {
     public Node parent;
@@ -13,8 +14,8 @@ public abstract class Node {
     public List<Node> children;
     protected boolean canBeCrossed;
     protected int depth;
-    protected int minDepth;
     public int indent;
+    public Random random;
 
     public Node() { // Program constructor
         this.parent = this;
@@ -24,6 +25,7 @@ public abstract class Node {
         this.children = new ArrayList<>();
         this.depth = 0;
         this.indent = 0;
+        this.random = new Random();
     }
 
     public Node(Node parent, String name, boolean canBeCrossed) {
@@ -33,7 +35,7 @@ public abstract class Node {
         this.children = new ArrayList<>();
         this.depth = parent.depth + 1;
         this.root = parent.root;
-
+        this.random = this.root.random;
         if(this.parent instanceof BlockNode) this.indent = this.parent.indent+1;
         else this.indent = this.parent.indent;
 

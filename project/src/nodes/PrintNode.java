@@ -5,7 +5,6 @@ import base.Node;
 public class PrintNode extends Node {
     public PrintNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
-        this.minDepth = 1;
     }
 
     @Override

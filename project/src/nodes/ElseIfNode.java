@@ -2,19 +2,14 @@ package nodes;
 
 import base.Node;
 
-import java.util.Random;
 
 public class ElseIfNode extends Node {
     public ElseIfNode(Node parent, String content, boolean canBeCrossed) {
         super(parent, content, canBeCrossed);
-        this.minDepth = 2;
     }
     @Override
     public void generateChildren() {
-        Random random = new Random();
-        int nextInt;
-        if(root.maxDepth - this.depth <= 1) nextInt = random.nextInt(2);
-        else nextInt = random.nextInt(3);
+        int nextInt = random.nextInt(3);
         switch (nextInt){
             case 0: // Only one block to if // min depth 1
                 this.children.add(new BlockNode(this, "if_block_last", true));
