@@ -29,18 +29,26 @@ public final class ExpressionProcessor {
     private static int computedInstructions = 0;
 
     private Value getBoolean(Value value){
-        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
+//        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
+        if (value.type.equals("notInit")) {
+//            semanticErrors.add("Error: variable not declared");
+            return new Value("");
+        }
         else if (value.type.equals("bool")) return value;
         else {
             float f = Float.parseFloat(value.value);
             return f>=0?new Value("true"):new Value("false");
         }
-        return new Value("false");
+//        return new Value("false");
     }
 
     private Value getFloat(Value value){
         switch (value.type) {
-            case "notInit" -> semanticErrors.add("Error: variable not declared");
+//            case "notInit" -> semanticErrors.add("Error: variable not declared");
+            case "notInit" -> {
+//                semanticErrors.add("Error: variable not declared");
+                return new Value("");
+            }
             case "float" -> {
                 return value;
             }
@@ -51,12 +59,16 @@ public final class ExpressionProcessor {
                 return new Value(String.valueOf(Float.parseFloat(value.value)));
             }
         }
-        return new Value("0.0");
+//        return new Value("0.0");
     }
 
     private Value getInt(Value value){
         switch (value.type) {
-            case "notInit" -> semanticErrors.add("Error: variable not declared");
+//            case "notInit" -> semanticErrors.add("Error: variable not declared");
+            case "notInit" -> {
+//                semanticErrors.add("Error: variable not declared");
+                return new Value("");
+            }
             case "int" -> {
                 return value;
             }
@@ -67,7 +79,7 @@ public final class ExpressionProcessor {
                 return new Value(String.valueOf(Math.round(Float.parseFloat(value.value))));
             }
         }
-        return new Value("0");
+//        return new Value("0");
     }
 
     private Value castToLeftType(Value left, Value right){
@@ -83,6 +95,7 @@ public final class ExpressionProcessor {
 
     private Value castToLeftType(String left_type, Value right){
         Value rightCasted;
+        if (left_type == null) return new Value("");
         switch (left_type){
             case "int" -> rightCasted = getInt(right);
             case "float" -> rightCasted = getFloat(right);
@@ -147,18 +160,8 @@ public final class ExpressionProcessor {
                     }
                 } else if (l instanceof VarDeclaration v) {
                     Value value = castToLeftType(v.variable.type, eval(v.variable.value));
-                    //FIXME: Below is commented only because
-                    // of implementation of two-run variable checking, uncomment when removed
-//                if(values.containsKey(v.variable.id))
-//                    semanticErrors.add("Error: variable `"+v.variable.id+"` already declared ("+v.variable.token.getLine()+")");
                     values.put(v.variable.id, value);
-                    //NOTE: No longer needed since we are casting to left type it will always match
-//                    types.put(v.variable.id, v.variable.type);
-//                    if (v.variable.value instanceof VarName vn && types.containsKey(vn.id) && !types.get(vn.id).equals(types.get(v.variable.id)))
-//                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
-                        // Checks if declared types match ^
-//                    else if (!types.get(v.variable.id).equals(value.type) && !value.type.equals("notInit"))
-//                        semanticErrors.add("Error: mismatched types! (" + v.variable.token.getLine() + ")");
+
                 } else if (l instanceof Assignment a) {
                     String idType = "";
                     if (!values.containsKey(a.id)) {
@@ -168,16 +171,10 @@ public final class ExpressionProcessor {
                     if (!values.containsKey(a.id)) {
                         if (parent != null && parent.values.containsKey(a.id)) {
                             parent.values.put(a.id, value);
-                            //NOTE: No longer needed since we are casting to left type it will always match
-//                            if (!parent.types.get(a.id).equals(value.type))
-//                                semanticErrors.add("Error: mismatched types! (" + a.token.getLine() + ")");
                         } else
                             semanticErrors.add("Error: variable `" + a.id + "` not declared (" + a.token.getLine() + ")");
                     } else {
                         values.put(a.id, value);
-                        //NOTE: No longer needed since we are casting to left type it will always match
-//                        if (!types.get(a.id).equals(value.type))
-//                            semanticErrors.add("Error: mismatched types! (" + a.token.getLine() + ")");
                     }
                 } else if (l instanceof Print p) {
                     if (p.id != null) {
@@ -194,8 +191,6 @@ public final class ExpressionProcessor {
                     Value condition = getBoolean(eval(w.condition));
                     if (condition.type.equals("notInit"))
                         semanticErrors.add("Error: not initialized value (" + w.token.getLine() + ")");
-                    else if (!condition.type.equals("bool"))
-                        semanticErrors.add("Error: can't resolve truth-value for given condition (" + w.token.getLine() + ")");
                     else if (condition.value.equals("true")) {
                         List<Line> whileList = new ArrayList<>();
                         whileList.add(w.block);
@@ -209,8 +204,6 @@ public final class ExpressionProcessor {
                     Value condition = getBoolean(eval(i.condition));
                     if (condition.type.equals("notInit"))
                         semanticErrors.add("Error: not initialized value (" + i.token.getLine() + ")");
-                    else if (!condition.type.equals("bool"))
-                        semanticErrors.add("Error: can't resolve truth-value for given condition (" + i.token.getLine() + ")");
                     else if (condition.value.equals("true")) {
                         ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.ifBlock.lines, this);
                         evaluations.addAll(ep.getEvalResults(null));
@@ -245,7 +238,7 @@ public final class ExpressionProcessor {
             Value right = eval(a.right);
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+a.token.getLine()+")");
-            if(left.type.equals(right.type)) {
+            else if(left.type.equals(right.type)) {
                 if (a.operator.equals("+")) {
                     switch (left.type) {
                         case "int" -> {
@@ -292,7 +285,7 @@ public final class ExpressionProcessor {
             Value right = eval(m.right);
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
-            if(left.type.equals(right.type)) {
+            else if(left.type.equals(right.type)) {
                 if (m.operator.equals("*")) {
                     switch (left.type) {
                         case "int" -> {
@@ -348,7 +341,7 @@ public final class ExpressionProcessor {
             String rightType = right.type;
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+p.token.getLine()+")");
-            if(leftType.equals(rightType)){
+            else if(leftType.equals(rightType)){
                 switch(leftType){
                     case "int" -> {
                         int leftInt = Integer.parseInt(left.value);
@@ -382,19 +375,31 @@ public final class ExpressionProcessor {
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
 
-            if(left.type.equals(right.type)) {
+            else if(left.type.equals(right.type)) {
                 switch (left.type) {
                     case "int" -> {
-                        Integer leftInt = Integer.parseInt(left.value);
-                        Integer rightInt = Integer.parseInt(right.value);
-                        int modulo = leftInt % rightInt;
-                        return new Value(Integer.toString(modulo));
+                        int leftInt = Integer.parseInt(left.value);
+                        int rightInt = Integer.parseInt(right.value);
+                        if(rightInt == 0) {
+                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
+                            return new Value(Integer.toString(leftInt));
+                        }
+                        else {
+                            int modulo = leftInt % rightInt;
+                            return new Value(Integer.toString(modulo));
+                        }
                     }
                     case "float" -> {
-                        Float leftFloat = Float.parseFloat(left.value);
-                        Float rightFloat = Float.parseFloat(right.value);
-                        float modulo = leftFloat % rightFloat;
-                        return new Value(Float.toString(modulo));
+                        float leftFloat = Float.parseFloat(left.value);
+                        float rightFloat = Float.parseFloat(right.value);
+                        if(rightFloat == 0) {
+                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
+                            return new Value(Float.toString(leftFloat));
+                        }
+                        else {
+                            float modulo = leftFloat % rightFloat;
+                            return new Value(Float.toString(modulo));
+                        }
                     }
                     case "bool" -> {
                         Value leftToInt = getInt(left);
@@ -410,7 +415,7 @@ public final class ExpressionProcessor {
             Value right = getBoolean(eval(cb.right));
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+cb.token.getLine()+")");
-            if(!(left.type.equals("bool") && right.type.equals("bool")))
+            else if(!(left.type.equals("bool") && right.type.equals("bool")))
                 semanticErrors.add("Error: combining non-bool types! ("+cb.token.getLine()+")"); // Should never get here
             else {
                 String operator = cb.operator;
@@ -437,7 +442,7 @@ public final class ExpressionProcessor {
             Value val = getBoolean(eval(n.expr));
             if(val.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+n.token.getLine()+")");
-            if(!val.type.equals("bool")) semanticErrors.add("Error: Can't negate non boolean values! ("+n.token.getLine()+")");
+            else if(!val.type.equals("bool")) semanticErrors.add("Error: Can't negate non boolean values! ("+n.token.getLine()+")");
             else switch (val.value) {
                 case "true" -> result = new Value("false");
                 case "false" -> result = new Value("true");
@@ -448,8 +453,8 @@ public final class ExpressionProcessor {
             Value right = eval(co.right);
             String operator = co.operator;
             if(left.type.equals("notInit") || right.type.equals("notInit"))
-                semanticErrors.add("Error: value not initialized ("+co.token.getLine()+")");
-            if(left.type.equals(right.type)){
+                semanticErrors.add("Error: value not initialized! ("+co.token.getLine()+")");
+            else if(left.type.equals(right.type)){
                 switch(left.type){
                     case "bool", "int" -> {
                         int leftInt = Integer.parseInt(String.valueOf(getInt(left).value));
