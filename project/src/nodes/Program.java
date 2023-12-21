@@ -8,6 +8,7 @@ import java.util.List;
 public class Program extends Node {
     public int maxDepth;
     public List<String> variables;
+    public double fitness = 0;
 
     public Program(int maxDepth) {
         super();

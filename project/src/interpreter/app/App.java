@@ -11,11 +11,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class App {
-    public static ProgramOutput run(String program) {
-        String inputFilePath = "C:\\Users\\LZ\\Desktop\\test_input.txt";
-        String inputDelimeter = " ";
+    public static ProgramOutput run(String program, String path) {
+        String inputDelimiter = " ";
         
         if(program.isEmpty()){
             System.err.println("Error: no program given");
@@ -28,10 +28,10 @@ public final class App {
             AntlrToProgram progVisitor = new AntlrToProgram();
             Program prog = progVisitor.visit(antlrAST);
 
-            ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputFilePath, inputDelimeter);
-            List<String> evaluations = ep.getEvalResults(null);
-            if(ExpressionProcessor.semanticErrors.isEmpty()) return new ProgramOutput(false, evaluations);
-            else return new ProgramOutput(true, evaluations);
+            ExpressionProcessor ep = new ExpressionProcessor(prog.lines, path, inputDelimiter);
+            List<Integer> evaluations = ep.getEvalResults(null).stream().filter(s -> !s.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+
+            return new ProgramOutput(!ExpressionProcessor.semanticErrors.isEmpty(), evaluations);
 
 //            if(progVisitor.semanticErrors.isEmpty()){
 //                ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputFilePath, inputDelimeter);
