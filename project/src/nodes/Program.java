@@ -9,6 +9,7 @@ public class Program extends Node {
     public int maxDepth;
     public int maxWidth;
     public List<String> variables;
+    public double fitness = 0;
 
     public Program(int maxDepth, int maxWidth) {
         super();
