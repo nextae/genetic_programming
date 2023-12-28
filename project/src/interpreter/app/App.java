@@ -10,7 +10,11 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public final class App {
@@ -19,19 +23,29 @@ public final class App {
         
         if(program.isEmpty()){
             System.err.println("Error: no program given");
-            return new ProgramOutput(true, null);
+            return new ProgramOutput(true, null, null);
         } else {
 //            String fileName = args[0];
             HelloParser parser = getParser(program);
-
             ParseTree antlrAST = parser.start();
             AntlrToProgram progVisitor = new AntlrToProgram();
             Program prog = progVisitor.visit(antlrAST);
 
-            ExpressionProcessor ep = new ExpressionProcessor(prog.lines, path, inputDelimiter);
+            File file = new File(path);
+            Scanner scanner = null;
+            try {
+                scanner = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            scanner.useDelimiter(inputDelimiter);
+            List<Integer> inputList = new ArrayList<>();
+            while(scanner.hasNext()) inputList.add(scanner.nextInt());
+
+            ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputList);
             List<Integer> evaluations = ep.getEvalResults(null).stream().filter(s -> !s.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
 
-            return new ProgramOutput(!ExpressionProcessor.semanticErrors.isEmpty(), evaluations);
+            return new ProgramOutput(!ExpressionProcessor.semanticErrors.isEmpty(), inputList, evaluations);
 
 //            if(progVisitor.semanticErrors.isEmpty()){
 //                ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputFilePath, inputDelimeter);

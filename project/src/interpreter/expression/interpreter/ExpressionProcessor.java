@@ -28,6 +28,8 @@ public final class ExpressionProcessor {
     private static File file;
     private static final int maxInstructions = 18;
     private static int computedInstructions = 0;
+    private static List<Integer> inputs;
+    private static int currentInput = 0;
     private static String inputDelimiter;
     private static boolean emptyInput = true;
 
@@ -133,15 +135,8 @@ public final class ExpressionProcessor {
         }
     }
 
-    public ExpressionProcessor(List<Line> lines, String inputFilePath, String inputDelimiter){
-        ExpressionProcessor.file = new File(inputFilePath);
-        ExpressionProcessor.inputDelimiter = inputDelimiter;
-        try {
-            ExpressionProcessor.scanner = new Scanner(file);
-            scanner.useDelimiter(inputDelimiter);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("File "+inputFilePath+" not found");
-        }
+    public ExpressionProcessor(List<Line> lines, List<Integer> inputs){
+        ExpressionProcessor.inputs = inputs;
         list = lines;
         values = new HashMap<>();
         types = new HashMap<>();
@@ -532,25 +527,16 @@ public final class ExpressionProcessor {
                 result = eval(new Comparison(left, co.operator, castToLeftType(left, right), co.token));
             }
         } else if (l instanceof Input){
-            String readValue;
-            if (scanner.hasNext()) {
-                readValue = scanner.next();
-                emptyInput = false;
+            int value;
+            if(inputs.isEmpty())value = 0;
+            else if (currentInput >= inputs.size()) {
+                value = inputs.get(0);
+                currentInput = 1;
             } else {
-                if(!emptyInput) {
-                    try {
-                        scanner = new Scanner(file);
-                        scanner.useDelimiter(inputDelimiter);
-                        readValue = scanner.next();
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    readValue = "0";
-                }
-//                semanticErrors.add("Error: no data left to use as input ("+i.token.getLine()+")");
+                value = inputs.get(currentInput);
+                currentInput++;
             }
-            result = new Value(readValue);
+            result = new Value(Integer.toString(value));
         }
         return (Value) checkIfNull(result);
     }
