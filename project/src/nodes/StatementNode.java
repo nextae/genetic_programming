@@ -8,6 +8,10 @@ public class StatementNode extends Node {
         super(parent, name, canBeCrossed);
     }
 
+    public StatementNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
+
     @Override
     public void generateChildren() {
         switch (random.nextInt(3)){
@@ -29,5 +33,15 @@ public class StatementNode extends Node {
     @Override
     public String toString() {
         return String.format("%s;\n", this.children.get(0));
+    }
+
+    @Override
+    public StatementNode clone(Node parent) {
+        StatementNode clone = new StatementNode(parent, name, canBeCrossed, false);
+
+        for (Node child : children)
+            clone.children.add(child.clone(clone));
+
+        return clone;
     }
 }

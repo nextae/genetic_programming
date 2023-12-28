@@ -7,6 +7,11 @@ public class ValueNode extends Node {
     public ValueNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
     }
+
+    public ValueNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
+
     @Override
     public void generateChildren() { // TODO: Added hard-coded low and high bounds - to be changed!!!
         switch (random.nextInt(3)){
@@ -25,5 +30,15 @@ public class ValueNode extends Node {
     @Override
     public String toString() {
         return value;
+    }
+
+    @Override
+    public ValueNode clone(Node parent) {
+        ValueNode clone = new ValueNode(parent, name, canBeCrossed, false);
+
+        for (Node child : children)
+            clone.children.add(child.clone(clone));
+
+        return clone;
     }
 }

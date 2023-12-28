@@ -166,22 +166,35 @@ public class Solver {
         }
 
         for (int e = 0; e < epochs; e++) {
-            System.out.println("Best fitness: " + bestFitness);
+            System.out.println(e + ". Best fitness: " + bestFitness);
             for (Program program : programs) {
                 if (program.fitness == bestFitness) {
                     System.out.println(program);
                     ProgramOutput output = App.run(program.toString(), path);
 
-                    // TODO: wtf?
                     System.out.print("OUTPUTS: ");
 
                     for (int o: output.outputs)
                         System.out.printf("%d ", o);
                     System.out.println();
+                    break;
                 }
             }
             if (bestFitness > -1e-4) {
                 System.out.println("PROBLEM SOLVED");
+                for (Program program : programs) {
+                    if (program.fitness == bestFitness) {
+                        System.out.println(program);
+                        ProgramOutput output = App.run(program.toString(), path);
+
+                        System.out.print("OUTPUTS: ");
+
+                        for (int o: output.outputs)
+                            System.out.printf("%d ", o);
+                        System.out.println();
+                        break;
+                    }
+                }
                 System.exit(0);
             }
             for (int i = 0; i < programs.size(); i++) {
@@ -208,6 +221,19 @@ public class Solver {
             }
         }
         System.out.println("PROBLEM NOT SOLVED");
+        for (Program program : programs) {
+            if (program.fitness == bestFitness) {
+                System.out.println(program);
+                ProgramOutput output = App.run(program.toString(), path);
+
+                System.out.print("OUTPUTS: ");
+
+                for (int o: output.outputs)
+                    System.out.printf("%d ", o);
+                System.out.println();
+                break;
+            }
+        }
     }
 
     private double fitness(Program program) {

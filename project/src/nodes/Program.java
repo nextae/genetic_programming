@@ -20,6 +20,17 @@ public class Program extends Node {
         generateChildren();
     }
 
+    public Program(int maxDepth, int maxWidth, boolean generateChildren) {
+        super();
+        this.root = this;
+        this.maxDepth = maxDepth;
+        this.maxWidth = maxWidth;
+        this.variables = new ArrayList<>();
+
+        if (generateChildren)
+            generateChildren();
+    }
+
     @Override
     public void generateChildren() {
         this.children.add(new LineNode(this, "line", true));
@@ -36,5 +47,15 @@ public class Program extends Node {
             text.append(child.toString());
 
         return text.toString();
+    }
+
+    @Override
+    public Program clone(Node parent) {
+        Program clone = new Program(maxDepth, maxWidth, false);
+
+        for (Node child : children)
+            clone.children.add(child.clone(clone));
+
+        return clone;
     }
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class Node{
+public abstract class Node {
     public Node parent;
     public Program root;
     protected String name;
@@ -53,7 +53,7 @@ public abstract class Node{
         if(this.parent instanceof BlockNode) this.indent = this.parent.indent+1;
         else this.indent = this.parent.indent;
 
-        if(generateChildren)
+        if (generateChildren)
             generateChildren();
     }
 
