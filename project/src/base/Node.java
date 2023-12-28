@@ -44,4 +44,6 @@ public abstract class Node {
 
     public abstract void generateChildren();
     public abstract String toString();
+
+    public abstract Node clone();
 }
