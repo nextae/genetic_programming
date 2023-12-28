@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class Node {
+public abstract class Node implements Cloneable{
     public Node parent;
     public Program root;
     protected String name;
