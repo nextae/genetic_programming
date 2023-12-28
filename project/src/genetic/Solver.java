@@ -8,9 +8,7 @@ import nodes.LineNode;
 import nodes.Program;
 import nodes.Token;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,16 +71,35 @@ public class Solver {
         return node.root;
     }
 
+//    public static List<Node> getAllNodes(Node node) {
+//        if (node.children.isEmpty())
+//            return new ArrayList<>();
+//
+//        List<Node> nodes = new ArrayList<>();
+//        for (Node child : node.children)
+//            nodes.addAll(getAllNodes(child));
+//
+//        nodes.addAll(node.children);
+//        return nodes;
+//    }
+
     public static List<Node> getAllNodes(Node node) {
-        if (node.children.isEmpty())
-            return new ArrayList<>();
-
+        Set<Node> visitedNodes = new HashSet<>();
         List<Node> nodes = new ArrayList<>();
-        for (Node child : node.children)
-            nodes.addAll(getAllNodes(child));
-
-        nodes.addAll(node.children);
+        getAllNodesHelper(node, visitedNodes, nodes);
         return nodes;
+    }
+
+    private static void getAllNodesHelper(Node node, Set<Node> visitedNodes, List<Node> nodes) {
+        if (!visitedNodes.contains(node)) {
+            visitedNodes.add(node);
+
+            for (Node child : node.children) {
+                getAllNodesHelper(child, visitedNodes, nodes);
+            }
+
+            nodes.add(node);
+        }
     }
 
     public static void setChildren(Node node, List<Node> new_children) {
@@ -190,11 +207,12 @@ public class Solver {
                 this.programs.remove(negativeTournament());
             }
         }
+        System.out.println("PROBLEM NOT SOLVED");
     }
 
     private double fitness(Program program) {
-        ProgramOutput output = App.run(program.toString(), path);
-        return -Fitnesses.ex1(output.outputs);
+        ProgramOutput result = App.run(program.toString(), path);
+        return -Fitnesses.ex1_1_B(result.inputs, result.outputs);
     }
 
     private List<Integer> parseLine(String line) {
