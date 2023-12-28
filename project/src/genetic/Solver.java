@@ -12,13 +12,15 @@ import java.util.stream.Collectors;
 public class Solver {
     private final ArrayList<Program> programs = new ArrayList<>();
     private int maxDepth;
+    private int maxWidth;
     private int epochs;
 
-    public Solver(int numberOfPrograms, int maxDepth, int epochs){
+    public Solver(int numberOfPrograms, int maxDepth, int maxWidth, int epochs){
         this.maxDepth = maxDepth;
+        this.maxWidth = maxWidth;
         this.epochs = epochs;
         for(int i=0; i<numberOfPrograms; i++){
-            programs.add(new Program(maxDepth));
+            programs.add(new Program(maxDepth, maxWidth));
         }
     }
 

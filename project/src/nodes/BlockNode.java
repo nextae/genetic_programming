@@ -9,8 +9,10 @@ public class BlockNode extends Node {
 
     @Override
     public void generateChildren() {
-        while (random.nextInt(2) != 0) {
+        int childrenCount = 0;
+        while (random.nextInt(2) != 0 && childrenCount < root.maxWidth) {
             this.children.add(new LineNode(this, "block_instruction", true));
+            childrenCount++;
         }
     }
 

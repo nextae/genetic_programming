@@ -7,12 +7,14 @@ import java.util.List;
 
 public class Program extends Node {
     public int maxDepth;
+    public int maxWidth;
     public List<String> variables;
 
-    public Program(int maxDepth) {
+    public Program(int maxDepth, int maxWidth) {
         super();
         this.root = this;
         this.maxDepth = maxDepth;
+        this.maxWidth = maxWidth;
         this.variables = new ArrayList<>();
         generateChildren();
     }
