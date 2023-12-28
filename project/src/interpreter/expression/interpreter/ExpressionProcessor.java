@@ -108,6 +108,11 @@ public final class ExpressionProcessor {
         return rightCasted;
     }
 
+    private Line checkIfNull(Line line){
+        if(line == null) return new Value("0");
+        else return line;
+    }
+
     public ExpressionProcessor(List<Line> lines, String inputFilePath, String inputDelimiter){
         ExpressionProcessor.file = new File(inputFilePath);
         this.inputDelimiter = inputDelimiter;
@@ -139,7 +144,7 @@ public final class ExpressionProcessor {
 
         if(list == null)list = this.list;
         for(Line l: list){
-            computedInstructions++;
+//            computedInstructions++;
             if(computedInstructions >= maxInstructions) break;
             if(l instanceof VarDeclaration v){
                 if(values.containsKey(v.variable.id)) {
@@ -153,7 +158,7 @@ public final class ExpressionProcessor {
         }
         if(!firstRunError) {
             for (Line l : list) {
-                computedInstructions++;
+//                computedInstructions++;
                 if(computedInstructions >= maxInstructions) break;
                 if (l instanceof Variable v) {
                     System.out.println("OH-OH! variable value: " + v.value);
@@ -198,8 +203,10 @@ public final class ExpressionProcessor {
                     else if (condition.value.equals("true")) {
                         List<Line> whileList = new ArrayList<>();
                         whileList.add(w.block);
-                        while (condition.value.equals("true") && computedInstructions <= maxInstructions) {
-                            computedInstructions++;
+                        int counter = 0;
+                        while (condition.value.equals("true") && computedInstructions <= maxInstructions && counter < 100) {
+//                            computedInstructions++;
+                            counter++;
                             evaluations.addAll(getEvalResults(whileList));
                             condition = eval(w.condition);
                         }
@@ -237,9 +244,9 @@ public final class ExpressionProcessor {
             if (values.containsKey(v.id)) result = values.get(v.id);
             else if(parent != null && parent.values.containsKey(v.id)) result = parent.values.get(v.id);
             else semanticErrors.add("Error: variable `"+v.id+"` not declared ("+v.token.getLine()+")");
-        } else if (l instanceof Addition a){
-            Value left = eval(a.left);
-            Value right = eval(a.right);
+        } else if (l instanceof Addition a) {
+            Value left = eval(checkIfNull(a.left));
+            Value right = eval(checkIfNull(a.right));
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+a.token.getLine()+")");
             else if(left.type.equals(right.type)) {
@@ -285,8 +292,8 @@ public final class ExpressionProcessor {
             }
 
         } else if (l instanceof Multiplication m){
-            Value left = eval(m.left);
-            Value right = eval(m.right);
+            Value left = eval(checkIfNull(m.left));
+            Value right = eval(checkIfNull(m.right));
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
             else if(left.type.equals(right.type)) {
@@ -339,8 +346,8 @@ public final class ExpressionProcessor {
                 result = eval(new Multiplication(left, m.operator, castToLeftType(left, right), m.token));
             }
         } else if (l instanceof Power p){
-            Value left = eval(p.left);
-            Value right = eval(p.right);
+            Value left = eval(checkIfNull(p.left));
+            Value right = eval(checkIfNull(p.right));
             String leftType = left.type;
             String rightType = right.type;
             if(left.type.equals("notInit") || right.type.equals("notInit"))
@@ -373,8 +380,8 @@ public final class ExpressionProcessor {
                 result = eval(new Power(left, castToLeftType(left, right), p.token));
             }
         } else if (l instanceof Modulo m) {
-            Value left = eval(m.dividend);
-            Value right = eval(m.divisor);
+            Value left = eval(checkIfNull(m.dividend));
+            Value right = eval(checkIfNull(m.divisor));
 
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
@@ -415,8 +422,8 @@ public final class ExpressionProcessor {
                 result = eval(new Modulo(left, castToLeftType(left, right), m.token));
             }
         } else if (l instanceof Combination cb) {
-            Value left = getBoolean(eval(cb.left));
-            Value right = getBoolean(eval(cb.right));
+            Value left = getBoolean(eval(checkIfNull(cb.left)));
+            Value right = getBoolean(eval(checkIfNull(cb.right)));
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+cb.token.getLine()+")");
             else if(!(left.type.equals("bool") && right.type.equals("bool")))
@@ -443,7 +450,7 @@ public final class ExpressionProcessor {
                 }
             }
         } else if (l instanceof Negation n) {
-            Value val = getBoolean(eval(n.expr));
+            Value val = getBoolean(eval(checkIfNull(n.expr)));
             if(val.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+n.token.getLine()+")");
             else if(!val.type.equals("bool")) semanticErrors.add("Error: Can't negate non boolean values! ("+n.token.getLine()+")");
@@ -453,8 +460,8 @@ public final class ExpressionProcessor {
                 case "null" -> result = new Value("null");
             }
         } else if (l instanceof Comparison co){
-            Value left = eval(co.left);
-            Value right = eval(co.right);
+            Value left = eval(checkIfNull(co.left));
+            Value right = eval(checkIfNull(co.right));
             String operator = co.operator;
             if(left.type.equals("notInit") || right.type.equals("notInit"))
                 semanticErrors.add("Error: value not initialized! ("+co.token.getLine()+")");
