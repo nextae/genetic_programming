@@ -10,6 +10,9 @@ public class BinaryOperatorNode extends Node {
     public BinaryOperatorNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
     }
+    public BinaryOperatorNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
 
     @Override
     public void generateChildren() {
@@ -56,5 +59,15 @@ public class BinaryOperatorNode extends Node {
     @Override
     public String toString() {
         return this.operator;
+    }
+
+    @Override
+    public BinaryOperatorNode clone(Node parent) {
+        BinaryOperatorNode clone = new BinaryOperatorNode(parent, name, canBeCrossed, false);
+        clone.operator = operator;
+        for(Node child: children) {
+            clone.children.add(child.clone(clone));
+        }
+        return clone;
     }
 }

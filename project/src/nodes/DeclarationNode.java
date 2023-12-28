@@ -7,6 +7,9 @@ public class DeclarationNode extends Node {
     public DeclarationNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
     }
+    public DeclarationNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
 
     @Override
     public void generateChildren() {
@@ -27,5 +30,14 @@ public class DeclarationNode extends Node {
     @Override
     public String toString() {
         return String.format("%s %s = %s", this.children.get(0), this.children.get(1), this.children.get(2));
+    }
+
+    @Override
+    public DeclarationNode clone(Node parent) {
+        DeclarationNode clone = new DeclarationNode(parent, name, canBeCrossed, false);
+        for(Node child: children) {
+            clone.children.add(child.clone(clone));
+        }
+        return clone;
     }
 }

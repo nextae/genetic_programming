@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class Node implements Cloneable{
+public abstract class Node{
     public Node parent;
     public Program root;
     protected String name;
@@ -42,8 +42,23 @@ public abstract class Node implements Cloneable{
         generateChildren();
     }
 
+    public Node(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        this.parent = parent;
+        this.name = name;
+        this.canBeCrossed = canBeCrossed;
+        this.children = new ArrayList<>();
+        this.depth = parent.depth + 1;
+        this.root = parent.root;
+        this.random = this.root.random;
+        if(this.parent instanceof BlockNode) this.indent = this.parent.indent+1;
+        else this.indent = this.parent.indent;
+
+        if(generateChildren)
+            generateChildren();
+    }
+
     public abstract void generateChildren();
     public abstract String toString();
 
-    public abstract Node clone();
+    public abstract Node clone(Node parent);
 }

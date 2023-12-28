@@ -6,6 +6,9 @@ public class BlockNode extends Node {
     public BlockNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
     }
+    public BlockNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
 
     @Override
     public void generateChildren() {
@@ -27,5 +30,14 @@ public class BlockNode extends Node {
         if(this.name.equals("if_block")) text.append("    ".repeat(this.indent)).append("} ");
         else text.append("    ".repeat(this.indent)).append("}\n");
         return text.toString();
+    }
+
+    @Override
+    public BlockNode clone(Node parent) {
+        BlockNode clone = new BlockNode(parent, name, canBeCrossed, false);
+        for(Node child: children) {
+            clone.children.add(child.clone(clone));
+        }
+        return clone;
     }
 }

@@ -7,6 +7,11 @@ public class ExprNode extends Node {
     public ExprNode(Node parent, String name, boolean canBeCrossed) {
         super(parent, name, canBeCrossed);
     }
+
+    public ExprNode(Node parent, String name, boolean canBeCrossed, boolean generateChildren) {
+        super(parent, name, canBeCrossed, generateChildren);
+    }
+
     @Override
     public void generateChildren() {
         int lowerBound = 0;
@@ -47,5 +52,14 @@ public class ExprNode extends Node {
         else for (Node child : children)
             text.append(child.toString());
         return text.toString();
+    }
+
+    @Override
+    public ExprNode clone(Node parent) {
+        ExprNode clone = new ExprNode(parent, name, canBeCrossed, false);
+        for(Node child: children) {
+            clone.children.add(child.clone(clone));
+        }
+        return clone;
     }
 }
