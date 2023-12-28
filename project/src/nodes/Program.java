@@ -56,6 +56,8 @@ public class Program extends Node {
         for (Node child : children)
             clone.children.add(child.clone(clone));
 
+        clone.variables = new ArrayList<>(variables);
+
         return clone;
     }
 }

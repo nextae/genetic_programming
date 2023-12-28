@@ -40,7 +40,7 @@ public class Solver {
             System.out.println("\n---------------------------------------BEFORE-MUTATION-END----------------------------------------\n");
         }
 
-        Node node = program;
+        Node node = program.clone(null);
 
 //        int randomInt = rng.nextInt(program.maxDepth);
 //        while (randomInt > 0) {
@@ -103,9 +103,9 @@ public class Solver {
     }
 
     public static void setChildren(Node node, List<Node> new_children) {
-        node.children = new ArrayList<>(new_children);
-        for (Node child : node.children)
-            child.parent = node;
+        node.children = new ArrayList<>();
+        for (Node child : new_children)
+            node.children.add(child.clone(node));
 
         for (Node child : getAllNodes(node)) {
             child.root = node.root;
@@ -119,9 +119,9 @@ public class Solver {
     }
 
     public static Program cross(Program program1, Program program2, boolean verbose) {
-        List<Node> nodeList1 = getAllNodes(program1)
+        List<Node> nodeList1 = getAllNodes(program1.clone(null))
                 .stream().filter(n -> n instanceof LineNode).toList();
-        List<Node> nodeList2 = getAllNodes(program2)
+        List<Node> nodeList2 = getAllNodes(program2.clone(null))
                 .stream().filter(n -> n instanceof LineNode).toList();
 
         if (verbose) {
@@ -151,7 +151,7 @@ public class Solver {
             System.out.println(p2);
             System.out.println("\n---------------------------------------CROSS-RESULT-CHANGE-END----------------------------------------\n");
             System.out.println("\n---------------------------------------CROSS-RESULT----------------------------------------\n");
-            System.out.println(program2);
+            System.out.println(p2.root);
             System.out.println("\n---------------------------------------CROSS-RESULT-END----------------------------------------\n");
         }
 
