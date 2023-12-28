@@ -13,7 +13,7 @@ public class BinaryOperatorNode extends Node {
 
     @Override
     public void generateChildren() {
-        switch (random.nextInt(14)){
+        switch (random.nextInt(12)){
             case 0:
                 this.operator = " + ";
                 break;
@@ -27,33 +27,27 @@ public class BinaryOperatorNode extends Node {
                 this.operator = " / ";
                 break;
             case 4:
-                this.operator = " ^ ";
-                break;
-            case 5:
-                this.operator = " % ";
-                break;
-            case 6:
                 this.operator = " > ";
                 break;
-            case 7:
+            case 5:
                 this.operator = " < ";
                 break;
-            case 8:
+            case 6:
                 this.operator = " == ";
                 break;
-            case 9:
+            case 7:
                 this.operator = " >= ";
                 break;
-            case 10:
+            case 8:
                 this.operator = " <= ";
                 break;
-            case 11:
+            case 9:
                 this.operator = " != ";
                 break;
-            case 12:
+            case 10:
                 this.operator = " and ";
                 break;
-            case 13:
+            case 11:
                 this.operator = " or ";
                 break;
         }

@@ -6,6 +6,7 @@ import interpreter.expression.blocks.IfBlock;
 import interpreter.expression.blocks.WhileBlock;
 import interpreter.expression.library.*;
 import interpreter.expression.logic.*;
+import interpreter.expression.toplevel.Expr;
 import interpreter.expression.toplevel.Line;
 import interpreter.expression.variables.*;
 
@@ -27,29 +28,31 @@ public final class ExpressionProcessor {
     private static File file;
     private static final int maxInstructions = 18;
     private static int computedInstructions = 0;
-    private String inputDelimiter;
+    private static String inputDelimiter;
     private static boolean emptyInput = true;
 
     private Value getBoolean(Value value){
 //        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
+        value = (Value) checkIfNull(value);
         if (value.type.equals("notInit")) {
 //            semanticErrors.add("Error: variable not declared");
-            return new Value("");
+            return new Value("1");
         }
         else if (value.type.equals("bool")) return value;
         else {
-            float f = Float.parseFloat(value.value);
+            float f = parseFloat(value.value);
             return f>=0?new Value("true"):new Value("false");
         }
 //        return new Value("false");
     }
 
     private Value getFloat(Value value){
+        value = (Value) checkIfNull(value);
         switch (value.type) {
 //            case "notInit" -> semanticErrors.add("Error: variable not declared");
             case "notInit" -> {
 //                semanticErrors.add("Error: variable not declared");
-                return new Value("");
+                return new Value("1");
             }
             case "float" -> {
                 return value;
@@ -58,18 +61,19 @@ public final class ExpressionProcessor {
                 return value.value.equals("true") ? new Value("1.0") : new Value("-1.0");
             }
             default -> {
-                return new Value(String.valueOf(Float.parseFloat(value.value)));
+                return new Value(String.valueOf(parseFloat(value.value)));
             }
         }
 //        return new Value("0.0");
     }
 
     private Value getInt(Value value){
+        value = (Value) checkIfNull(value);
         switch (value.type) {
 //            case "notInit" -> semanticErrors.add("Error: variable not declared");
             case "notInit" -> {
 //                semanticErrors.add("Error: variable not declared");
-                return new Value("");
+                return new Value("1");
             }
             case "int" -> {
                 return value;
@@ -78,7 +82,7 @@ public final class ExpressionProcessor {
                 return value.value.equals("true") ? new Value("1") : new Value("-1");
             }
             default -> {
-                return new Value(String.valueOf(Math.round(Float.parseFloat(value.value))));
+                return new Value(String.valueOf(Math.round(parseFloat(value.value))));
             }
         }
 //        return new Value("0");
@@ -86,24 +90,24 @@ public final class ExpressionProcessor {
 
     private Value castToLeftType(Value left, Value right){
         Value rightCasted;
-        if (left.type == null || right.type == null) return new Value("");
+        if (left.type == null || right.type == null) return new Value("1");
         switch (left.type){
             case "int" -> rightCasted = getInt(right);
             case "float" -> rightCasted = getFloat(right);
             case "bool" -> rightCasted = getBoolean(right);
-            default -> rightCasted = new Value(""); // Should never go to default
+            default -> rightCasted = new Value("1"); // Should never go to default
         }
         return rightCasted;
     }
 
     private Value castToLeftType(String left_type, Value right){
         Value rightCasted;
-        if (left_type == null || right.type == null) return new Value("");
+        if (left_type == null || right.type == null) return new Value("1");
         switch (left_type){
             case "int" -> rightCasted = getInt(right);
             case "float" -> rightCasted = getFloat(right);
             case "bool" -> rightCasted = getBoolean(right);
-            default -> rightCasted = new Value(""); // Should never go to default
+            default -> rightCasted = new Value("1"); // Should never go to default
         }
         return rightCasted;
     }
@@ -113,9 +117,25 @@ public final class ExpressionProcessor {
         else return line;
     }
 
+    private int parseInt(String s){
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException n) {
+            return 1;
+        }
+    }
+
+    private float parseFloat(String s){
+        try {
+            return Float.parseFloat(s);
+        } catch (NumberFormatException n) {
+            return 1;
+        }
+    }
+
     public ExpressionProcessor(List<Line> lines, String inputFilePath, String inputDelimiter){
         ExpressionProcessor.file = new File(inputFilePath);
-        this.inputDelimiter = inputDelimiter;
+        ExpressionProcessor.inputDelimiter = inputDelimiter;
         try {
             ExpressionProcessor.scanner = new Scanner(file);
             scanner.useDelimiter(inputDelimiter);
@@ -237,7 +257,7 @@ public final class ExpressionProcessor {
 
     private Value eval(Line l){
         Value result = new Value("");
-
+        l = checkIfNull(l);
         if(l instanceof Value v){
             result = new Value(v.value);
         } else if (l instanceof VarName v){
@@ -253,13 +273,13 @@ public final class ExpressionProcessor {
                 if (a.operator.equals("+")) {
                     switch (left.type) {
                         case "int" -> {
-                            int leftInt = Integer.parseInt(left.value);
-                            int rightInt = Integer.parseInt(right.value);
+                            int leftInt = parseInt(left.value);
+                            int rightInt = parseInt(right.value);
                             result = new Value(Integer.toString(leftInt + rightInt));
                         }
                         case "float" -> {
-                            float leftFloat = Float.parseFloat(left.value);
-                            float rightFloat = Float.parseFloat(right.value);
+                            float leftFloat = parseFloat(left.value);
+                            float rightFloat = parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat + rightFloat));
                         }
                         case "bool" -> {
@@ -271,13 +291,13 @@ public final class ExpressionProcessor {
                 } else if (a.operator.equals("-")) {
                     switch (left.type) {
                         case "int" -> {
-                            int leftInt = Integer.parseInt(left.value);
-                            int rightInt = Integer.parseInt(right.value);
+                            int leftInt = parseInt(left.value);
+                            int rightInt = parseInt(right.value);
                             result = new Value(Integer.toString(leftInt - rightInt));
                         }
                         case "float" -> {
-                            float leftFloat = Float.parseFloat(left.value);
-                            float rightFloat = Float.parseFloat(right.value);
+                            float leftFloat = parseFloat(left.value);
+                            float rightFloat = parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat - rightFloat));
                         }
                         case "bool" -> {
@@ -300,13 +320,13 @@ public final class ExpressionProcessor {
                 if (m.operator.equals("*")) {
                     switch (left.type) {
                         case "int" -> {
-                            int leftInt = Integer.parseInt(left.value);
-                            int rightInt = Integer.parseInt(right.value);
+                            int leftInt = parseInt(left.value);
+                            int rightInt = parseInt(right.value);
                             result = new Value(Integer.toString(leftInt * rightInt));
                         }
                         case "float" -> {
-                            float leftFloat = Float.parseFloat(left.value);
-                            float rightFloat = Float.parseFloat(right.value);
+                            float leftFloat = parseFloat(left.value);
+                            float rightFloat = parseFloat(right.value);
                             result = new Value(Float.toString(leftFloat * rightFloat));
                         }
                         case "bool" -> {
@@ -318,8 +338,9 @@ public final class ExpressionProcessor {
                 } else if (m.operator.equals("/")) {
                     switch (left.type) {
                         case "int" -> {
-                            int leftInt = Integer.parseInt(left.value);
-                            int rightInt = Integer.parseInt(right.value);
+                            int leftInt = parseInt(left.value);
+                            int rightInt = parseInt(right.value);
+                            if (rightInt == 0) rightInt = 1;
                             try {
                                 result = new Value(Integer.toString(leftInt / rightInt));
                             } catch (ArithmeticException e) {
@@ -327,8 +348,9 @@ public final class ExpressionProcessor {
                             }
                         }
                         case "float" -> {
-                            float leftFloat = Float.parseFloat(left.value);
-                            float rightFloat = Float.parseFloat(right.value);
+                            float leftFloat = parseFloat(left.value);
+                            float rightFloat = parseFloat(right.value);
+                            if (rightFloat == 0) rightFloat = 1;
                             try {
                                 result = new Value(Float.toString(leftFloat / rightFloat));
                             } catch (ArithmeticException e) {
@@ -355,14 +377,14 @@ public final class ExpressionProcessor {
             else if(leftType.equals(rightType)){
                 switch(leftType){
                     case "int" -> {
-                        int leftInt = Integer.parseInt(left.value);
-                        int rightInt = Integer.parseInt(right.value);
+                        int leftInt = parseInt(left.value);
+                        int rightInt = parseInt(right.value);
                         int power = (int) Math.pow(leftInt, rightInt);
                         result = new Value(Integer.toString(power));
                     }
                     case "float" -> {
-                        float leftFloat = Float.parseFloat(left.value);
-                        float rightFloat = Float.parseFloat(right.value);
+                        float leftFloat = parseFloat(left.value);
+                        float rightFloat = parseFloat(right.value);
                         double power = Math.pow(leftFloat, rightFloat);
                         result = new Value(Double.toString(power));
                     }
@@ -374,7 +396,7 @@ public final class ExpressionProcessor {
                 }
             } else if((left.type.equals("float") || left.type.equals("int"))
                     && (right.type.equals("float") || right.type.equals("int"))) {
-                double power = Math.pow(Float.parseFloat(left.value), Float.parseFloat(right.value));
+                double power = Math.pow(parseFloat(left.value), parseFloat(right.value));
                 result = new Value(Double.toString(power));
             } else {
                 result = eval(new Power(left, castToLeftType(left, right), p.token));
@@ -389,28 +411,30 @@ public final class ExpressionProcessor {
             else if(left.type.equals(right.type)) {
                 switch (left.type) {
                     case "int" -> {
-                        int leftInt = Integer.parseInt(left.value);
-                        int rightInt = Integer.parseInt(right.value);
+                        int leftInt = parseInt(left.value);
+                        int rightInt = parseInt(right.value);
                         if(rightInt == 0) {
-                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
-                            return new Value(Integer.toString(leftInt));
+//                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
+//                            return new Value(Integer.toString(leftInt));
+                            rightInt = 1;
                         }
-                        else {
+//                        else {
                             int modulo = leftInt % rightInt;
                             return new Value(Integer.toString(modulo));
-                        }
+//                        }
                     }
                     case "float" -> {
-                        float leftFloat = Float.parseFloat(left.value);
-                        float rightFloat = Float.parseFloat(right.value);
+                        float leftFloat = parseFloat(left.value);
+                        float rightFloat = parseFloat(right.value);
                         if(rightFloat == 0) {
-                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
-                            return new Value(Float.toString(leftFloat));
+//                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
+//                            return new Value(Float.toString(leftFloat));
+                            rightFloat = 1;
                         }
-                        else {
+//                        else {
                             float modulo = leftFloat % rightFloat;
                             return new Value(Float.toString(modulo));
-                        }
+//                        }
                     }
                     case "bool" -> {
                         Value leftToInt = getInt(left);
@@ -468,8 +492,8 @@ public final class ExpressionProcessor {
             else if(left.type.equals(right.type)){
                 switch(left.type){
                     case "bool", "int" -> {
-                        int leftInt = Integer.parseInt(String.valueOf(getInt(left).value));
-                        int rightInt = Integer.parseInt(String.valueOf(getInt(right).value));
+                        int leftInt = parseInt(String.valueOf(getInt(left).value));
+                        int rightInt = parseInt(String.valueOf(getInt(right).value));
                         switch (operator) {
                             case "==" -> result = new Value(Boolean.toString(leftInt == rightInt));
                             case "!=" -> result = new Value(Boolean.toString(leftInt != rightInt));
@@ -480,8 +504,8 @@ public final class ExpressionProcessor {
                         }
                     }
                     case "float" -> {
-                        float leftFloat = Float.parseFloat(String.valueOf(getFloat(left).value));
-                        float rightFloat = Float.parseFloat(String.valueOf(getFloat(right).value));
+                        float leftFloat = parseFloat(String.valueOf(getFloat(left).value));
+                        float rightFloat = parseFloat(String.valueOf(getFloat(right).value));
                         switch (operator) {
                             case "==" -> result = new Value(Boolean.toString(leftFloat == rightFloat));
                             case "!=" -> result = new Value(Boolean.toString(leftFloat != rightFloat));
@@ -494,8 +518,8 @@ public final class ExpressionProcessor {
                 }
             } else if((left.type.equals("float") || left.type.equals("int"))
                     && (right.type.equals("float") || right.type.equals("int"))) {
-                float leftFloat = Float.parseFloat(String.valueOf(getFloat(left).value));
-                float rightFloat = Float.parseFloat(String.valueOf(getFloat(right).value));
+                float leftFloat = parseFloat(String.valueOf(getFloat(left).value));
+                float rightFloat = parseFloat(String.valueOf(getFloat(right).value));
                 switch (operator) {
                     case "==" -> result = new Value(Boolean.toString(leftFloat == rightFloat));
                     case "!=" -> result = new Value(Boolean.toString(leftFloat != rightFloat));
@@ -528,6 +552,6 @@ public final class ExpressionProcessor {
             }
             result = new Value(readValue);
         }
-        return result;
+        return (Value) checkIfNull(result);
     }
 }
