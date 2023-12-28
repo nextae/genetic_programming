@@ -23,11 +23,11 @@ public class Solver {
 
     private int tournamentSize = 3;
 
-    public Solver(String path, int numberOfPrograms, int maxDepth, int epochs) {
+    public Solver(String path, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) {
         this.path = path;
         this.epochs = epochs;
         for (int i = 0; i < numberOfPrograms; i++)
-            programs.add(new Program(maxDepth));
+            programs.add(new Program(maxDepth, maxWidth));
     }
 
     public static Program mutation(Program program) {
