@@ -17,7 +17,7 @@ public class Main {
 //        Program p2 = new Program(3);
 //        Solver.mutation(p1);
 
-        Solver solver = new Solver("src/input.txt", 200, 4, 6, 300);
+        Solver solver = new Solver("src/input.txt", 100, 4, 6, 300);
         solver.solve();
     }
 }

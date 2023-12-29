@@ -166,36 +166,13 @@ public class Solver {
         }
 
         for (int e = 0; e < epochs; e++) {
-            System.out.println(e + ". Best fitness: " + bestFitness);
-            for (Program program : programs) {
-                if (program.fitness == bestFitness) {
-                    System.out.println(program);
-                    ProgramOutput output = App.run(program.toString(), path);
-
-                    System.out.print("OUTPUTS: ");
-
-                    for (int o: output.outputs)
-                        System.out.printf("%d ", o);
-                    System.out.println();
-                    break;
-                }
-            }
             if (bestFitness > -1e-4) {
                 System.out.println("PROBLEM SOLVED");
-                for (Program program : programs) {
-                    if (program.fitness == bestFitness) {
-                        System.out.println(program);
-                        ProgramOutput output = App.run(program.toString(), path);
-
-                        System.out.print("OUTPUTS: ");
-
-                        for (int o: output.outputs)
-                            System.out.printf("%d ", o);
-                        System.out.println();
-                        break;
-                    }
-                }
+                printBestProgram();
                 System.exit(0);
+            } else {
+                System.out.println(e + ". Best fitness: " + bestFitness);
+                printBestProgram();
             }
             for (int i = 0; i < programs.size(); i++) {
                 switch (random.nextInt(2)) {
@@ -221,6 +198,10 @@ public class Solver {
             }
         }
         System.out.println("PROBLEM NOT SOLVED");
+        printBestProgram();
+    }
+
+    private void printBestProgram() {
         for (Program program : programs) {
             if (program.fitness == bestFitness) {
                 System.out.println(program);
@@ -238,14 +219,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), path);
-        return -Fitnesses.ex1_1_B(result.inputs, result.outputs);
-    }
-
-    private List<Integer> parseLine(String line) {
-        return Stream.of(line.split(" "))
-                .filter(s -> !s.isEmpty())
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        return -Fitnesses.ex1_2_E(result.inputs, result.outputs);
     }
 
     public Program tournament() {

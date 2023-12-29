@@ -54,6 +54,7 @@ public class Program extends Node {
         Program clone = new Program(maxDepth, maxWidth, false, variables);
         clone.parent = clone;
         clone.root = clone;
+
         for (Node child : children)
             clone.children.add(child.clone(clone));
 

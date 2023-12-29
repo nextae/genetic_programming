@@ -38,7 +38,9 @@ public class ValueNode extends Node {
 
         for (Node child : children)
             clone.children.add(child.clone(clone));
+
         clone.value = value;
+
         return clone;
     }
 }

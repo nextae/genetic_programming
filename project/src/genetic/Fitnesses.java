@@ -56,7 +56,7 @@ public class Fitnesses {
     }
 
     public static double ex1_1_F(List<Integer> inputs, List<Integer> outputs) {
-        if (outputs.isEmpty())
+        if (inputs.size() < 2 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int outputSizeDifference = Math.abs(outputs.size() - 1);
@@ -65,7 +65,7 @@ public class Fitnesses {
     }
 
     public static double ex1_2_A(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.size() < 2)
+        if (inputs.size() < 2 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int a = inputs.get(0);
@@ -85,7 +85,7 @@ public class Fitnesses {
     }
 
     public static double ex1_2_D(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.size() < 2)
+        if (inputs.size() < 2 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int a = inputs.get(0);
@@ -97,7 +97,7 @@ public class Fitnesses {
     }
 
     public static double ex1_2_E(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.size() < 2)
+        if (inputs.size() < 2 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int a = inputs.get(0);
@@ -109,7 +109,7 @@ public class Fitnesses {
     }
 
     public static double ex1_3_A(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.size() < 2)
+        if (inputs.size() < 2 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int a = inputs.get(0);
@@ -125,7 +125,7 @@ public class Fitnesses {
     }
 
     public static double ex1_4_A(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.size() < 10)
+        if (inputs.size() < 10 || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int sum = 0;
@@ -140,7 +140,7 @@ public class Fitnesses {
     }
 
     public static double ex1_4_B(List<Integer> inputs, List<Integer> outputs) {
-        if (inputs.isEmpty())
+        if (inputs.isEmpty() || outputs.isEmpty())
             return Integer.MAX_VALUE;
 
         int n = inputs.get(0);
