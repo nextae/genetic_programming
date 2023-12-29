@@ -12,7 +12,6 @@ public class AssignmentNode extends Node {
     @Override
     public void generateChildren() {
         String variable = this.root.variables.get(random.nextInt(this.root.variables.size()));
-
         this.children.add(new VariableNode(this, variable, true));
         this.children.add(new ExprNode(this, "expr", true));
     }

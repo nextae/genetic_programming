@@ -20,12 +20,12 @@ public class Program extends Node {
         generateChildren();
     }
 
-    public Program(int maxDepth, int maxWidth, boolean generateChildren) {
+    public Program(int maxDepth, int maxWidth, boolean generateChildren, List<String> variables) {
         super();
         this.root = this;
         this.maxDepth = maxDepth;
         this.maxWidth = maxWidth;
-        this.variables = new ArrayList<>();
+        this.variables = variables;
 
         if (generateChildren)
             generateChildren();
@@ -51,12 +51,13 @@ public class Program extends Node {
 
     @Override
     public Program clone(Node parent) {
-        Program clone = new Program(maxDepth, maxWidth, false);
-
+        Program clone = new Program(maxDepth, maxWidth, false, variables);
+//        clone.parent = clone;
+        clone.root = clone;
         for (Node child : children)
             clone.children.add(child.clone(clone));
 
-        clone.variables = new ArrayList<>(variables);
+//        clone.variables = new ArrayList<>(variables);
 
         return clone;
     }

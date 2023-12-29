@@ -19,19 +19,14 @@ public final class ExpressionProcessor {
     private ExpressionProcessor parent = null;
     private final List<Line> list;
     public static final List<String> semanticErrors = new ArrayList<>();
-
     private final Map<String, Value> values;
     private final Map<String, String> types;
-
     private boolean firstRunError = false;
-    private static Scanner scanner;
-    private static File file;
-    private static final int maxInstructions = 18;
-    private static int computedInstructions = 0;
+    private int maxInstructions;
+    private int computedInstructions;
     private static List<Integer> inputs;
     private static int currentInput = 0;
-    private static String inputDelimiter;
-    private static boolean emptyInput = true;
+
 
     private Value getBoolean(Value value){
 //        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
@@ -140,6 +135,8 @@ public final class ExpressionProcessor {
         list = lines;
         values = new HashMap<>();
         types = new HashMap<>();
+        computedInstructions = 0;
+        maxInstructions = 1000;
     }
 
     public ExpressionProcessor(List<Line> lines, ExpressionProcessor parent){
@@ -159,7 +156,7 @@ public final class ExpressionProcessor {
 
         if(list == null)list = this.list;
         for(Line l: list){
-//            computedInstructions++;
+            computedInstructions++;
             if(computedInstructions >= maxInstructions) break;
             if(l instanceof VarDeclaration v){
                 if(values.containsKey(v.variable.id)) {
@@ -173,7 +170,7 @@ public final class ExpressionProcessor {
         }
         if(!firstRunError) {
             for (Line l : list) {
-//                computedInstructions++;
+                computedInstructions++;
                 if(computedInstructions >= maxInstructions) break;
                 if (l instanceof Variable v) {
                     System.out.println("OH-OH! variable value: " + v.value);
@@ -220,7 +217,7 @@ public final class ExpressionProcessor {
                         whileList.add(w.block);
                         int counter = 0;
                         while (condition.value.equals("true") && computedInstructions <= maxInstructions && counter < 100) {
-//                            computedInstructions++;
+                            computedInstructions++;
                             counter++;
                             evaluations.addAll(getEvalResults(whileList));
                             condition = eval(w.condition);
@@ -231,19 +228,22 @@ public final class ExpressionProcessor {
                     if (condition.type.equals("notInit"))
                         semanticErrors.add("Error: not initialized value (" + i.token.getLine() + ")");
                     else if (condition.value.equals("true")) {
-                        ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.ifBlock.lines, this);
-                        evaluations.addAll(ep.getEvalResults(null));
+//                        ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.ifBlock.lines, this);
+//                        evaluations.addAll(ep.getEvalResults(null));
+                        evaluations.addAll(this.getEvalResults(i.elseBlock.ifBlock.lines));
                     } else if (condition.value.equals("false") && i.elseBlock.elseBlock != null) {
-                        ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.elseBlock.lines, this);
-                        evaluations.addAll(ep.getEvalResults(null));
+//                        ExpressionProcessor ep = new ExpressionProcessor(i.elseBlock.elseBlock.lines, this);
+//                        evaluations.addAll(ep.getEvalResults(null));
+                        evaluations.addAll(this.getEvalResults(i.elseBlock.elseBlock.lines));
                     } else if (condition.value.equals("false") && i.elseBlock.child != null) {
                         List<Line> childList = new ArrayList<>();
                         childList.add(i.elseBlock.child);
                         evaluations.addAll(getEvalResults(childList));
                     }
                 } else if (l instanceof Block b) {
-                    ExpressionProcessor ep = new ExpressionProcessor(b.lines, this);
-                    evaluations.addAll(ep.getEvalResults(null));
+//                    ExpressionProcessor ep = new ExpressionProcessor(b.lines, this);
+//                    evaluations.addAll(ep.getEvalResults(null));
+                    evaluations.addAll(this.getEvalResults(b.lines));
                 }
             }
         }
@@ -361,84 +361,6 @@ public final class ExpressionProcessor {
                 }
             } else {
                 result = eval(new Multiplication(left, m.operator, castToLeftType(left, right), m.token));
-            }
-        } else if (l instanceof Power p){
-            Value left = eval(checkIfNull(p.left));
-            Value right = eval(checkIfNull(p.right));
-            String leftType = left.type;
-            String rightType = right.type;
-            if(left.type.equals("notInit") || right.type.equals("notInit"))
-                semanticErrors.add("Error: value not initialized! ("+p.token.getLine()+")");
-            else if(leftType.equals(rightType)){
-                switch(leftType){
-                    case "int" -> {
-                        int leftInt = parseInt(left.value);
-                        int rightInt = parseInt(right.value);
-                        int power = (int) Math.pow(leftInt, rightInt);
-                        result = new Value(Integer.toString(power));
-                    }
-                    case "float" -> {
-                        float leftFloat = parseFloat(left.value);
-                        float rightFloat = parseFloat(right.value);
-                        double power = Math.pow(leftFloat, rightFloat);
-                        result = new Value(Double.toString(power));
-                    }
-                    case "bool" -> {
-                        Value leftToInt = getInt(left);
-                        Value rightToInt = getInt(right);
-                        result = getBoolean(eval(new Power(leftToInt, rightToInt, p.token)));
-                    }
-                }
-            } else if((left.type.equals("float") || left.type.equals("int"))
-                    && (right.type.equals("float") || right.type.equals("int"))) {
-                double power = Math.pow(parseFloat(left.value), parseFloat(right.value));
-                result = new Value(Double.toString(power));
-            } else {
-                result = eval(new Power(left, castToLeftType(left, right), p.token));
-            }
-        } else if (l instanceof Modulo m) {
-            Value left = eval(checkIfNull(m.dividend));
-            Value right = eval(checkIfNull(m.divisor));
-
-            if(left.type.equals("notInit") || right.type.equals("notInit"))
-                semanticErrors.add("Error: value not initialized! ("+m.token.getLine()+")");
-
-            else if(left.type.equals(right.type)) {
-                switch (left.type) {
-                    case "int" -> {
-                        int leftInt = parseInt(left.value);
-                        int rightInt = parseInt(right.value);
-                        if(rightInt == 0) {
-//                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
-//                            return new Value(Integer.toString(leftInt));
-                            rightInt = 1;
-                        }
-//                        else {
-                            int modulo = leftInt % rightInt;
-                            return new Value(Integer.toString(modulo));
-//                        }
-                    }
-                    case "float" -> {
-                        float leftFloat = parseFloat(left.value);
-                        float rightFloat = parseFloat(right.value);
-                        if(rightFloat == 0) {
-//                            semanticErrors.add("Error: can't divide by 0! (" + m.token.getLine() + ")");
-//                            return new Value(Float.toString(leftFloat));
-                            rightFloat = 1;
-                        }
-//                        else {
-                            float modulo = leftFloat % rightFloat;
-                            return new Value(Float.toString(modulo));
-//                        }
-                    }
-                    case "bool" -> {
-                        Value leftToInt = getInt(left);
-                        Value rightToInt = getInt(right);
-                        result = getBoolean(eval(new Modulo(leftToInt, rightToInt, m.token)));
-                    }
-                }
-            } else {
-                result = eval(new Modulo(left, castToLeftType(left, right), m.token));
             }
         } else if (l instanceof Combination cb) {
             Value left = getBoolean(eval(checkIfNull(cb.left)));
