@@ -394,11 +394,11 @@ public final class ExpressionProcessor {
             Value val = eval(checkIfNull(n.expr));
             switch(val.type){
                 case "int" -> {
-                    int i = Integer.parseInt(val.value);
+                    int i = parseInt(val.value);
                     return new Value(Integer.toString(-i));
                 }
                 case "float" -> {
-                    float f = Float.parseFloat(val.value);
+                    float f = parseFloat(val.value);
                     return new Value(Float.toString(-f));
                 }
                 case "bool" -> {

@@ -60,7 +60,7 @@ public class Solver {
             System.out.println("\n---------------------------------------BEFORE-MUTATION-END----------------------------------------\n");
         }
 
-        Node node = program.clone(null);
+        Program clone = program.clone(null);
 
 //        int randomInt = rng.nextInt(program.maxDepth);
 //        while (randomInt > 0) {
@@ -71,12 +71,13 @@ public class Solver {
 //            node = node.children.get(rng.nextInt(node.children.size()));
 //        }
 
-        List<Node> allNodes = getAllNodes(node);
-        node = allNodes.get(random.nextInt(allNodes.size()));  // Get a random node to mutate
+        List<Node> allNodes = getAllNodes(clone);
+        Node node = allNodes.get(random.nextInt(allNodes.size()));  // Get a random node to mutate
         if (node instanceof Token)
             node = node.parent;
 
         node.children.clear();
+        node.root = clone;
 
         node.generateChildren();
 
@@ -91,21 +92,10 @@ public class Solver {
         return node.root;
     }
 
-//    public static List<Node> getAllNodes(Node node) {
-//        if (node.children.isEmpty())
-//            return new ArrayList<>();
-//
-//        List<Node> nodes = new ArrayList<>();
-//        for (Node child : node.children)
-//            nodes.addAll(getAllNodes(child));
-//
-//        nodes.addAll(node.children);
-//        return nodes;
-//    }
-
     public static List<Node> getAllNodes(Node node) {
         Set<Node> visitedNodes = new HashSet<>();
         List<Node> nodes = new ArrayList<>();
+
         getAllNodesHelper(node, visitedNodes, nodes);
         return nodes;
     }
@@ -120,6 +110,13 @@ public class Solver {
 
             nodes.add(node);
         }
+    }
+
+    private static void getMaxIndent(Node node, int[] maxIndent){
+        for (Node child : node.children) {
+            getMaxIndent(child, maxIndent);
+        }
+        maxIndent[0] = Math.max(maxIndent[0], node.indent);
     }
 
     public static void setChildren(Node node, List<Node> new_children) {
@@ -139,10 +136,17 @@ public class Solver {
     }
 
     public static Program cross(Program program1, Program program2, boolean verbose) {
-        List<Node> nodeList1 = getAllNodes(program1.clone(null))
-                .stream().filter(n -> n instanceof LineNode).toList();
+
         List<Node> nodeList2 = getAllNodes(program2.clone(null))
                 .stream().filter(n -> n instanceof LineNode).toList();
+        int r_2 = random.nextInt(nodeList2.size());
+        Node p2 = nodeList2.get(r_2);
+        List<Node> nodeList1 = getAllNodes(program1.clone(null))
+                .stream().filter(n -> n instanceof LineNode).filter(n -> {
+                    int[] maxIndent = {Integer.MIN_VALUE};
+                    getMaxIndent(n, maxIndent);
+                    return maxIndent[0] - n.indent <= p2.root.maxDepth - p2.indent;
+                }).toList();
 
         if (verbose) {
             System.out.println("\n---------------------------------------CROSS P1----------------------------------------\n");
@@ -152,17 +156,11 @@ public class Solver {
             System.out.println(program2);
             System.out.println("\n---------------------------------------CROSS P2 END----------------------------------------\n");
         }
-
         int r_1 = random.nextInt(nodeList1.size());
-        int r_2 = random.nextInt(nodeList2.size());
 
         Node p1 = nodeList1.get(r_1);
-        Node p2 = nodeList2.get(r_2);
 
-        List<Node> p1_children = new ArrayList<>(p1.children);
-
-        setChildren(p1, p2.children);
-        setChildren(p2, p1_children);
+        setChildren(p2, p1.children);
 
         if (verbose) {
             System.out.println("\n---------------------------------------CROSS-RESULT-CHANGE-P1--------------------------------------\n");
@@ -196,7 +194,7 @@ public class Solver {
                 printBestProgram(epoch);
             }
             for (int i = 0; i < programs.size(); i++) {
-                switch (random.nextInt(2)) {
+                switch (random.nextInt(10)) {
                     case 0:  // Mutation
                         Program mutated = mutation(tournament());
                         mutated.fitness = fitness(mutated);
@@ -205,7 +203,7 @@ public class Solver {
 
                         this.programs.add(mutated);
                         break;
-                    case 1:  // Crossover
+                    default:  // Crossover
                         Program crossed = cross(tournament(), tournament());
                         crossed.fitness = fitness(crossed);
 
@@ -215,6 +213,7 @@ public class Solver {
                         this.programs.add(crossed);
                         break;
                 }
+
                 this.programs.remove(negativeTournament());
             }
         }

@@ -11,9 +11,13 @@ public class AssignmentNode extends Node {
     }
     @Override
     public void generateChildren() {
+        if(this.root.variables.isEmpty()) {
+            this.root.variables.add("x0"); // Safety precautions
+        }
         String variable = this.root.variables.get(random.nextInt(this.root.variables.size()));
         this.children.add(new VariableNode(this, variable, true));
         this.children.add(new ExprNode(this, "expr", true));
+
     }
 
     @Override
