@@ -25,7 +25,7 @@ public final class ExpressionProcessor {
     private int maxInstructions;
     private int computedInstructions;
     private static List<Integer> inputs;
-    private static int currentInput = 0;
+    private int currentInput = 0;
 
 
     private Value getBoolean(Value value){
