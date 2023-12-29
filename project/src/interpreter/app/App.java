@@ -18,44 +18,24 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public final class App {
-    public static ProgramOutput run(String program, String path) {
-        String inputDelimiter = " ";
-        
-        if(program.isEmpty()){
-            System.err.println("Error: no program given");
+    public static ProgramOutput run(String program, List<List<Integer>> inputs) {
+        if(program.isEmpty())
             return new ProgramOutput(true, null, null);
-        } else {
-//            String fileName = args[0];
-            HelloParser parser = getParser(program);
-            ParseTree antlrAST = parser.start();
-            AntlrToProgram progVisitor = new AntlrToProgram();
-            Program prog = progVisitor.visit(antlrAST);
 
-            File file = new File(path);
-            Scanner scanner = null;
-            try {
-                scanner = new Scanner(file);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            scanner.useDelimiter(inputDelimiter);
-            List<Integer> inputList = new ArrayList<>();
-            while(scanner.hasNext()) inputList.add(scanner.nextInt());
+        HelloParser parser = getParser(program);
+        ParseTree antlrAST = parser.start();
+        AntlrToProgram progVisitor = new AntlrToProgram();
+        Program prog = progVisitor.visit(antlrAST);
 
+        List<List<Integer>> outputs = new ArrayList<>();
+
+        for (List<Integer> inputList : inputs) {
             ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputList);
-            List<Integer> evaluations = ep.getEvalResults(null).stream().filter(s -> !s.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-
-            return new ProgramOutput(!ExpressionProcessor.semanticErrors.isEmpty(), inputList, evaluations);
-
-//            if(progVisitor.semanticErrors.isEmpty()){
-//                ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputFilePath, inputDelimeter);
-//                List<String> evaluations = ep.getEvalResults(null);
-//                if(ExpressionProcessor.semanticErrors.isEmpty())
-//                    for(String eval: evaluations) {
-//                        System.out.println(eval);
-//                } else for(String err : ExpressionProcessor.semanticErrors) System.out.println(err);
-//            } else for(String err : progVisitor.semanticErrors) System.out.println(err);
+            List<Integer> evaluations = ep.getEvalResults(null).stream().filter(s -> !s.isEmpty()).map(Integer::parseInt).toList();
+            outputs.add(evaluations);
         }
+
+        return new ProgramOutput(!ExpressionProcessor.semanticErrors.isEmpty(), inputs, outputs);
     }
 
     private static HelloParser getParser(String program){

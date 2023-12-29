@@ -1,6 +1,6 @@
 package genetic;
 
-public enum generationMethods {
+public enum GenerationMethods {
     FULL,
     GROW
 }

@@ -1,7 +1,7 @@
 package nodes;
 
 import base.Node;
-import genetic.generationMethods;
+import genetic.GenerationMethods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +11,9 @@ public class Program extends Node {
     public int maxWidth;
     public List<String> variables;
     public double fitness = 0;
-    public generationMethods method;
+    public GenerationMethods method;
 
-    public Program(int maxDepth, int maxWidth) {
-        super();
-        this.root = this;
-        this.maxDepth = maxDepth;
-        this.maxWidth = maxWidth;
-        this.variables = new ArrayList<>();
-        generateChildren();
-    }
-
-    public Program(int maxDepth, int maxWidth, generationMethods method) {
+    public Program(int maxDepth, int maxWidth, GenerationMethods method) {
         super();
         this.root = this;
         this.maxDepth = maxDepth;

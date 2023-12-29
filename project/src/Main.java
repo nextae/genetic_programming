@@ -3,10 +3,12 @@ import interpreter.app.App;
 import interpreter.app.ProgramOutput;
 import nodes.Program;
 
+import java.io.FileNotFoundException;
+
 public class Main {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 //        Program p0 = new Program(100);
 //        System.out.println(p0);
 //        ProgramOutput output = App.run(p0.toString());
@@ -17,7 +19,7 @@ public class Main {
 //        Program p2 = new Program(3);
 //        Solver.mutation(p1);
 
-        Solver solver = new Solver("src/input.txt", 100, 4, 6, 300);
+        Solver solver = new Solver("src/input.txt", 300, 3, 5, 300);
         solver.solve();
     }
 }

@@ -8,24 +8,44 @@ import nodes.LineNode;
 import nodes.Program;
 import nodes.Token;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Solver {
     private final ArrayList<Program> programs = new ArrayList<>();
-    private String path;
     private int epochs;
     private double bestFitness = Double.NEGATIVE_INFINITY;
     private static Random random = new Random();
 
     private int tournamentSize = 3;
+    private List<List<Integer>> inputs;
 
-    public Solver(String path, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) {
-        this.path = path;
+    public Solver(String path, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) throws FileNotFoundException {
         this.epochs = epochs;
         for (int i = 0; i < numberOfPrograms; i++)
-            programs.add(new Program(maxDepth, maxWidth, generationMethods.GROW));
+            programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
+
+        Scanner scanner = new Scanner(new File(path));
+
+        List<List<Integer>> inputs = new ArrayList<>();
+
+        // Iterate through each line in the file
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+
+            String[] tokens = line.split(" ");
+            List<Integer> integers = new ArrayList<>();
+
+            for (String token : tokens)
+                integers.add(Integer.parseInt(token));
+
+            inputs.add(integers);
+        }
+
+        scanner.close();
+
+        this.inputs = inputs;
     }
 
     public static Program mutation(Program program) {
@@ -165,14 +185,15 @@ public class Solver {
                 bestFitness = program.fitness;
         }
 
-        for (int e = 0; e < epochs; e++) {
+        int epoch;
+        for (epoch = 0; epoch < epochs; epoch++) {
             if (bestFitness > -1e-4) {
                 System.out.println("PROBLEM SOLVED");
-                printBestProgram();
+                printBestProgram(epoch);
                 System.exit(0);
             } else {
-                System.out.println(e + ". Best fitness: " + bestFitness);
-                printBestProgram();
+                System.out.println(epoch + ". Best fitness: " + bestFitness);
+                printBestProgram(epoch);
             }
             for (int i = 0; i < programs.size(); i++) {
                 switch (random.nextInt(2)) {
@@ -198,28 +219,31 @@ public class Solver {
             }
         }
         System.out.println("PROBLEM NOT SOLVED");
-        printBestProgram();
+        printBestProgram(epoch);
     }
 
-    private void printBestProgram() {
+    private void printBestProgram(int epoch) {
         for (Program program : programs) {
             if (program.fitness == bestFitness) {
                 System.out.println(program);
-                ProgramOutput output = App.run(program.toString(), path);
+                ProgramOutput output = App.run(program.toString(), inputs);
 
-                System.out.print("OUTPUTS: ");
+                System.out.println("======= EPOCH " + epoch + ", BEST FITNESS " + bestFitness + ", OUTPUTS =======");
+                for (List<Integer> outputList : output.outputs) {
+                    for (int o: outputList)
+                        System.out.printf("%d ", o);
 
-                for (int o: output.outputs)
-                    System.out.printf("%d ", o);
-                System.out.println();
+                    System.out.print("\n");
+                }
+                System.out.println("=======================");
                 break;
             }
         }
     }
 
     private double fitness(Program program) {
-        ProgramOutput result = App.run(program.toString(), path);
-        return -Fitnesses.ex1_2_E(result.inputs, result.outputs);
+        ProgramOutput result = App.run(program.toString(), inputs);
+        return -Fitnesses.ex1_4_B(result.inputs, result.outputs);
     }
 
     public Program tournament() {
