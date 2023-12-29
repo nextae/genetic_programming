@@ -194,7 +194,7 @@ public class Solver {
                 printBestProgram(epoch);
             }
             for (int i = 0; i < programs.size(); i++) {
-                switch (random.nextInt(10)) {
+                switch (random.nextInt(5)) {
                     case 0:  // Mutation
                         Program mutated = mutation(tournament());
                         mutated.fitness = fitness(mutated);
@@ -242,7 +242,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), inputs);
-        return -Fitnesses.ex1_3_A(result.inputs, result.outputs);
+        return -Fitnesses.smallest(result.inputs, result.outputs);
     }
 
     public Program tournament() {

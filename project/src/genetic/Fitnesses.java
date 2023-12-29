@@ -1,10 +1,14 @@
 package genetic;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Fitnesses {
     private static final int INVALID_VALUE = 99999;
     private static final int OUTPUT_SIZE_DIFFERENCE_WEIGHT = 3;
+    private static final int DEFAULT_VALUE = 1;
 
     public static double ex1_1_A(List<List<Integer>> inputs, List<List<Integer>> outputs) {
         return calculateFitness(inputs, outputs, 1);
@@ -104,6 +108,53 @@ public class Fitnesses {
             }
 
             sum += calculateFitnessForMeanOperation(input, output, n, true);
+        }
+
+        return (double) sum / inputs.size();
+    }
+
+    public static double negativeToZero(List<List<Integer>> inputs, List<List<Integer>> outputs) {
+        long sum = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            List<Integer> input = inputs.get(i);
+            List<Integer> output = outputs.get(i);
+            if (input.isEmpty() || output.isEmpty()) {
+                sum += INVALID_VALUE;
+                continue;
+            }
+            int outputSizeDifference = Math.abs(output.size() - input.size());
+
+            int sumDifferences = 0;
+
+            for (int j = 0; j < input.size(); j++) {
+                int value = input.get(j);
+                if (value < 0)
+                    value = 0;
+
+                int outputValue = j < output.size() ? output.get(j) : DEFAULT_VALUE;
+
+                sumDifferences += Math.abs(value - outputValue);
+            }
+
+            sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + sumDifferences;
+        }
+
+        return (double) sum / inputs.size();
+    }
+
+    public static double smallest(List<List<Integer>> inputs, List<List<Integer>> outputs) {
+        long sum = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            List<Integer> input = inputs.get(i);
+            List<Integer> output = outputs.get(i);
+            if (input.size() < 4 || output.isEmpty()) {
+                sum += INVALID_VALUE;
+                continue;
+            }
+
+            int outputSizeDifference = Math.abs(output.size() - 1);
+
+            sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(Collections.min(input) - output.get(0));
         }
 
         return (double) sum / inputs.size();
