@@ -73,7 +73,7 @@ public class Fitnesses {
                 continue;
             }
 
-            sum += (long) calculateFitnessForMeanOperation(input, output, 2, false);
+            sum += calculateFitnessForMeanOperation(input, output, 2, false);
         }
 
         return (double) sum / inputs.size();
@@ -95,7 +95,7 @@ public class Fitnesses {
                 continue;
             }
 
-            sum += (long) calculateFitnessForMeanOperation(input, output, n, true);
+            sum += calculateFitnessForMeanOperation(input, output, n, true);
         }
 
         return (double) sum / inputs.size();
@@ -191,12 +191,12 @@ public class Fitnesses {
         return (double) sum / inputs.size();
     }
 
-    private static double calculateFitnessForMeanOperation(List<Integer> inputs, List<Integer> outputs, int count, boolean skipFirst) {
-        if (inputs.size() < count || outputs.isEmpty())
+    private static int calculateFitnessForMeanOperation(List<Integer> inputs, List<Integer> outputs, int count, boolean skipFirst) {
+        if (inputs.size() < (count + (skipFirst ? 1 : 0)) || outputs.isEmpty())
             return INVALID_VALUE;
 
         int sum = 0;
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count + (skipFirst ? 1 : 0); i++)
             if (!skipFirst || i != 0)
                 sum += inputs.get(i);
 
@@ -204,6 +204,6 @@ public class Fitnesses {
 
         int outputSizeDifference = Math.abs(outputs.size() - 1);
 
-        return (outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(outputs.get(0) - mean));
+        return outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(outputs.get(0) - mean);
     }
 }

@@ -19,7 +19,7 @@ public class Solver {
     private static Random random = new Random();
 
     private int tournamentSize = 3;
-    private List<List<Integer>> inputs;
+    public List<List<Integer>> inputs;
 
     public Solver(String path, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) throws FileNotFoundException {
         this.epochs = epochs;
