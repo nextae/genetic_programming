@@ -8,7 +8,6 @@ import java.util.List;
 public class Fitnesses {
     private static final int INVALID_VALUE = 99999;
     private static final int OUTPUT_SIZE_DIFFERENCE_WEIGHT = 3;
-    private static final int DEFAULT_VALUE = 1;
 
     public static double ex1_1_A(List<List<Integer>> inputs, List<List<Integer>> outputs) {
         return calculateFitness(inputs, outputs, 1);
@@ -155,6 +154,31 @@ public class Fitnesses {
             int outputSizeDifference = Math.abs(output.size() - 1);
 
             sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(Collections.min(input) - output.get(0));
+        }
+
+        return (double) sum / inputs.size();
+    }
+
+    public static double gecco_4(List<List<Integer>> inputs, List<List<Integer>> outputs) {
+        long sum = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            List<Integer> input = inputs.get(i);
+            List<Integer> output = outputs.get(i);
+            int[] inputValues = new int[3];
+            if (input.isEmpty() || output.isEmpty()) {
+                inputValues = new int[]{1,1,1};
+            } else {
+                for(int ii = 0; ii < 3; ii++){
+                    inputValues[ii] = input.get(ii % input.size());
+                }
+            }
+            int expected = (inputValues[0] < inputValues[1] && inputValues[1] < inputValues[2]) ? 1 : -1;
+            if (output.isEmpty()) sum += INVALID_VALUE;
+            else {
+                sum += output.get(0) == expected ? 0 : 1;
+                int outputSizeDifference = Math.abs(output.size() - 1);
+                sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT;
+            }
         }
 
         return (double) sum / inputs.size();
