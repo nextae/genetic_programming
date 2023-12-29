@@ -242,7 +242,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), inputs);
-        return -Fitnesses.ex1_4_B(result.inputs, result.outputs);
+        return -Fitnesses.ex1_3_A(result.inputs, result.outputs);
     }
 
     public Program tournament() {
