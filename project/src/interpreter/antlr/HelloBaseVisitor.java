@@ -1,4 +1,4 @@
-// Generated from ./Hello.g4 by ANTLR 4.13.1
+// Generated from Hello.g4 by ANTLR 4.13.1
 
     package interpreter.antlr;
 

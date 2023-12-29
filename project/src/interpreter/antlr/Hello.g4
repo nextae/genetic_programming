@@ -4,32 +4,6 @@ grammar Hello;
     package interpreter.antlr;
 }
 
-BOOL
-    :'true'
-    | 'false';
-
-INT
-    : '-'?[1-9]([0-9])*
-    | '0';
-
-FLOAT
-    : '-'?[0-9]*'.'[0-9]+
-    | '-'?[0-9]'.';
-
-WS
-    : [ \t\n\r]+ -> skip;
-
-TYPE
-    : 'int'
-    | 'float'
-    | 'bool';
-
-VARNAME
-    : [a-z][a-zA-Z0-9_]*;
-
-LBRACKET : '(';
-RBRACKET : ')';
-
 start //
     : line* EOF;
 
@@ -76,9 +50,9 @@ expr //Things with (in theory) value behind them
     | expr ('==' | '!=' | '>'
           | '<' | '>=' | '<=') expr # Compare //
     | expr ('and' | 'or') expr      # Combination //
-    | '!' expr                      # Negation //
+    | ('!' | '-') expr              # Negation //
     | val                           # Value //
-    | stdin                         # Input
+    | stdin                         # Input //
     ;
 
 val
@@ -93,3 +67,31 @@ assignment
 
 block //
     : '{' line* '}';
+
+INT
+    : [1-9]([0-9])*
+    | '0';
+
+FLOAT
+    : [0-9]*'.'[0-9]+
+    | [0-9]'.';
+
+BOOL
+    :'true'
+    | 'false';
+
+
+TYPE
+    : 'int'
+    | 'float'
+    | 'bool';
+
+VARNAME
+    : [a-z][a-zA-Z0-9_]*;
+
+LBRACKET : '(';
+RBRACKET : ')';
+
+WS
+    : [ \t\n\r]+ -> skip;
+

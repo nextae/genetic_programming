@@ -391,15 +391,22 @@ public final class ExpressionProcessor {
                 }
             }
         } else if (l instanceof Negation n) {
-            Value val = getBoolean(eval(checkIfNull(n.expr)));
-            if(val.type.equals("notInit"))
-                semanticErrors.add("Error: value not initialized! ("+n.token.getLine()+")");
-            else if(!val.type.equals("bool")) semanticErrors.add("Error: Can't negate non boolean values! ("+n.token.getLine()+")");
-            else switch (val.value) {
-                case "true" -> result = new Value("false");
-                case "false" -> result = new Value("true");
-                case "null" -> result = new Value("null");
+            Value val = eval(checkIfNull(n.expr));
+            switch(val.type){
+                case "int" -> {
+                    int i = Integer.parseInt(val.value);
+                    return new Value(Integer.toString(-i));
+                }
+                case "float" -> {
+                    float f = Float.parseFloat(val.value);
+                    return new Value(Float.toString(-f));
+                }
+                case "bool" -> {
+                    if(val.value.equals("true")) return new Value("false");
+                    else return new Value("true");
+                }
             }
+
         } else if (l instanceof Comparison co){
             Value left = eval(checkIfNull(co.left));
             Value right = eval(checkIfNull(co.right));
