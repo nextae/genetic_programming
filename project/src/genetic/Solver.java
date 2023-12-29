@@ -26,8 +26,17 @@ public class Solver {
         for (int i = 0; i < numberOfPrograms; i++)
             programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
 
-        Scanner scanner = new Scanner(new File(path));
 
+
+        this.inputs = generateRandomCases(50, 3, -50, 50);
+    }
+
+    public static Program mutation(Program program) {
+        return mutation(program, false);
+    }
+
+    private List<List<Integer>> inputFromFile(String path) throws FileNotFoundException{
+        Scanner scanner = new Scanner(new File(path));
         List<List<Integer>> inputs = new ArrayList<>();
 
         // Iterate through each line in the file
@@ -44,12 +53,19 @@ public class Solver {
         }
 
         scanner.close();
-
-        this.inputs = inputs;
+        return inputs;
     }
 
-    public static Program mutation(Program program) {
-        return mutation(program, false);
+    private static List<List<Integer>> generateRandomCases(int rows, int cols, int lowerBound, int upperBound){
+        List<List<Integer>> list = new ArrayList<>();
+        Random rng = new Random();
+        for(int i = 0; i<rows; i++){
+            list.add(new ArrayList<>());
+            for(int j = 0; j<cols; j++){
+                list.get(i).add(rng.nextInt(lowerBound, upperBound));
+            }
+        }
+        return list;
     }
 
     public static Program mutation(Program program, boolean verbose) {
@@ -194,7 +210,7 @@ public class Solver {
                 printBestProgram(epoch);
             }
             for (int i = 0; i < programs.size(); i++) {
-                switch (random.nextInt(10)) {
+                switch (random.nextInt(5)) {
                     case 0:  // Mutation
                         Program mutated = mutation(tournament());
                         mutated.fitness = fitness(mutated);
@@ -242,7 +258,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), inputs);
-        return -Fitnesses.ex1_3_A(result.inputs, result.outputs);
+        return -Fitnesses.gecco_4(result.inputs, result.outputs);
     }
 
     public Program tournament() {
