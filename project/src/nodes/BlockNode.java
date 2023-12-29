@@ -12,10 +12,20 @@ public class BlockNode extends Node {
 
     @Override
     public void generateChildren() {
-        int childrenCount = 0;
-        while (random.nextInt(2) != 0 && childrenCount < root.maxWidth) {
-            this.children.add(new LineNode(this, "block_instruction", true));
-            childrenCount++;
+        int counter = 0;
+        switch(root.method) {
+            case GROW:
+                counter = 1;
+                this.children.add(new LineNode(this, "block_instruction", true));
+                while (random.nextInt(2) != 0 && counter < root.maxWidth) {
+                    this.children.add(new LineNode(this, "block_instruction", true));
+                    counter++;
+                } break;
+            case FULL:
+                while (counter < root.maxWidth) {
+                    this.children.add(new LineNode(this, "block_instruction", true));
+                    counter++;
+                } break;
         }
     }
 

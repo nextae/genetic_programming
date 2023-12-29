@@ -25,7 +25,7 @@ public class Solver {
         this.path = path;
         this.epochs = epochs;
         for (int i = 0; i < numberOfPrograms; i++)
-            programs.add(new Program(maxDepth, maxWidth));
+            programs.add(new Program(maxDepth, maxWidth, generationMethods.GROW));
     }
 
     public static Program mutation(Program program) {

@@ -1,6 +1,7 @@
 package nodes;
 
 import base.Node;
+import genetic.generationMethods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ public class Program extends Node {
     public int maxWidth;
     public List<String> variables;
     public double fitness = 0;
+    public generationMethods method;
 
     public Program(int maxDepth, int maxWidth) {
         super();
@@ -17,6 +19,16 @@ public class Program extends Node {
         this.maxDepth = maxDepth;
         this.maxWidth = maxWidth;
         this.variables = new ArrayList<>();
+        generateChildren();
+    }
+
+    public Program(int maxDepth, int maxWidth, generationMethods method) {
+        super();
+        this.root = this;
+        this.maxDepth = maxDepth;
+        this.maxWidth = maxWidth;
+        this.variables = new ArrayList<>();
+        this.method = method;
         generateChildren();
     }
 
@@ -33,10 +45,20 @@ public class Program extends Node {
 
     @Override
     public void generateChildren() {
-        this.children.add(new LineNode(this, "line", true));
-        this.children.add(new LineNode(this, "line", true));
-        while(random.nextInt(5) != 0) {
-            this.children.add(new LineNode(this, "line", true));
+        int counter = 0;
+        switch(method) {
+            case GROW:
+                counter = 1;
+                this.children.add(new LineNode(this, "line", true));
+                while (random.nextInt(5) != 0 && counter < maxWidth) {
+                    counter++;
+                    this.children.add(new LineNode(this, "line", true));
+                } break;
+            case FULL:
+                while (counter < maxWidth) {
+                    counter++;
+                    this.children.add(new LineNode(this, "line", true));
+                } break;
         }
     }
 
@@ -54,6 +76,7 @@ public class Program extends Node {
         Program clone = new Program(maxDepth, maxWidth, false, variables);
         clone.parent = clone;
         clone.root = clone;
+        clone.method = method;
 
         for (Node child : children)
             clone.children.add(child.clone(clone));
