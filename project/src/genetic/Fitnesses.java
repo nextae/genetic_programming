@@ -27,12 +27,20 @@ public class Fitnesses {
     }
 
     public static double ex1_1_F(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-        if (inputs.size() < 2 || outputs.isEmpty())
-            return Integer.MAX_VALUE;
+        long sum = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            List<Integer> output = outputs.get(i);
+            if (output.isEmpty()) {
+                sum += INVALID_VALUE;
+                continue;
+            }
 
-        int outputSizeDifference = Math.abs(outputs.size() - 1);
+            int outputSizeDifference = Math.abs(output.size() - 1);
 
-        return (outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(outputs.get(0).get(0) - 1));
+            sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + Math.abs(output.get(0) - 1);
+        }
+
+        return (double) sum / inputs.size();
     }
 
     public static double ex1_2_A(List<List<Integer>> inputs, List<List<Integer>> outputs) {
@@ -73,7 +81,7 @@ public class Fitnesses {
                 continue;
             }
 
-            sum += calculateFitnessForMeanOperation(input, output, 2, false);
+            sum += calculateFitnessForMeanOperation(input, output, 10, false);
         }
 
         return (double) sum / inputs.size();

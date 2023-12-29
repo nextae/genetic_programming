@@ -21,7 +21,7 @@ public class Main {
 //        Program p2 = new Program(3);
 //        Solver.mutation(p1);
 
-        Solver solver = new Solver("src/input.txt", 10000, 3, 5, 100);
+        Solver solver = new Solver("src/input.txt", 10000, 3, 3, 100);
         solver.solve();
 
 //        ProgramOutput output = App.run("while (-5020 >= !3424 or (!input()) / 321.9619) < input() or !((2473 or !1836)) * !(-7101.3096){\n" +
