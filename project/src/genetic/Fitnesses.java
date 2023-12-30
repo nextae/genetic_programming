@@ -270,6 +270,10 @@ public class Fitnesses {
         return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 3, in -> in.get(0) && in.get(1) || in.get(2));
     }
 
+    public static Fitness or_and() {
+        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 3, in -> in.get(0) || in.get(1) && in.get(2));
+    }
+
     public static Fitness xor_and() {
         return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 3, in -> in.get(0) ^ in.get(1) && in.get(2));
     }
@@ -280,6 +284,10 @@ public class Fitnesses {
 
     public static Fitness and_xor_or() {
         return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 4, in -> in.get(0) && in.get(1) ^ in.get(2) || in.get(3));
+    }
+
+    public static Fitness and_and_or() {
+        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 4, in -> in.get(0) && in.get(1) && in.get(2) || in.get(3));
     }
 
     public static Fitness and_or_xor_and() {

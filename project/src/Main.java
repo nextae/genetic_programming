@@ -11,12 +11,12 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         Solver solver = new Solver(
-            Input.truthTable(1),
+            Input.truthTable(3),
             5000,
             3,
             5,
-            150,
-            Fitnesses.not()
+            50,
+            Fitnesses.or_and()
         );
         solver.solve();
 
