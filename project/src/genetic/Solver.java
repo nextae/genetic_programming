@@ -23,10 +23,13 @@ public class Solver {
 
     public Solver(List<List<Integer>> inputs, int numberOfPrograms, int maxDepth, int maxWidth, int epochs, Fitnesses.Fitness fitness) throws FileNotFoundException {
         this.epochs = epochs;
-        for (int i = 0; i < numberOfPrograms; i++)
-            programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
         this.fitness = fitness;
         this.inputs = inputs;
+        for (int i = 0; i < numberOfPrograms / 2; i++)
+            programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
+        for (int i = numberOfPrograms / 2; i < numberOfPrograms; i++){
+            programs.add(new Program(maxDepth, maxWidth, GenerationMethods.FULL));
+        }
     }
 
     public static Program mutation(Program program) {
@@ -175,7 +178,7 @@ public class Solver {
                 printBestProgram(epoch);
             }
             for (int i = 0; i < programs.size(); i++) {
-                switch (random.nextInt(5)) {
+                switch (random.nextInt(3)) {
                     case 0:  // Mutation
                         Program mutated = mutation(tournament());
                         mutated.fitness = fitness(mutated);
