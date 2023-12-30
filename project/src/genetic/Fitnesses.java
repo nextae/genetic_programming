@@ -448,7 +448,7 @@ public class Fitnesses {
 
             int outputSizeDifference = Math.abs(output.size() - 1);
 
-            sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + (function.execute(input) == outputBool ? 1 : 0);
+            sum += (long) outputSizeDifference * OUTPUT_SIZE_DIFFERENCE_WEIGHT + (function.execute(input) == outputBool ? 0 : 1);
         }
 
         return (double) sum / inputs.size();

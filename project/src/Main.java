@@ -10,8 +10,14 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-
-        Solver solver = new Solver(Input.truthTable(2), 2000, 3, 5, 200);
+        Solver solver = new Solver(
+            Input.truthTable(1),
+            5000,
+            3,
+            5,
+            150,
+            Fitnesses.not()
+        );
         solver.solve();
 
 //        ProgramOutput output = App.run("{\n" +
