@@ -29,8 +29,9 @@ public final class App {
 
         List<List<Integer>> outputs = new ArrayList<>();
 
+        ExpressionProcessor ep = new ExpressionProcessor(prog.lines, new ArrayList<>());
         for (List<Integer> inputList : inputs) {
-            ExpressionProcessor ep = new ExpressionProcessor(prog.lines, inputList);
+            ep.reset(prog.lines, inputList);
             List<Integer> evaluations = ep.getEvalResults(null).stream().filter(s -> !s.isEmpty()).map(Integer::parseInt).toList();
             outputs.add(evaluations);
         }

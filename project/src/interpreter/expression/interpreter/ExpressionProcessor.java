@@ -17,17 +17,25 @@ import java.util.*;
 public final class ExpressionProcessor {
 
     private ExpressionProcessor parent = null;
-    private final List<Line> list;
-    public static final List<String> semanticErrors = new ArrayList<>();
-    private final Map<String, Value> values;
-    private final Map<String, String> types;
+    private List<Line> list;
+    public static List<String> semanticErrors = new ArrayList<>();
+    private Map<String, Value> values;
+    private Map<String, String> types;
     private boolean firstRunError = false;
     private int maxInstructions;
     private int computedInstructions;
     private static List<Integer> inputs;
     private int currentInput = 0;
 
-
+    public void reset(List<Line> lines, List<Integer> inputs){
+        currentInput = 0;
+        computedInstructions = 0;
+        values.clear();
+        types.clear();
+        semanticErrors.clear();
+        list = lines;
+        ExpressionProcessor.inputs = inputs;
+    }
     private Value getBoolean(Value value){
 //        if (value.type.equals("notInit")) semanticErrors.add("Error: variable not declared");
         value = (Value) checkIfNull(value);
