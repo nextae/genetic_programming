@@ -17,55 +17,19 @@ public class Solver {
     private int epochs;
     private double bestFitness = Double.NEGATIVE_INFINITY;
     private static Random random = new Random();
-
     private int tournamentSize = 3;
     public List<List<Integer>> inputs;
 
-    public Solver(String path, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) throws FileNotFoundException {
+    public Solver(List<List<Integer>> inputs, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) throws FileNotFoundException {
         this.epochs = epochs;
         for (int i = 0; i < numberOfPrograms; i++)
             programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
 
-
-
-        this.inputs = generateRandomCases(50, 3, -50, 50);
+        this.inputs = inputs;
     }
 
     public static Program mutation(Program program) {
         return mutation(program, false);
-    }
-
-    private List<List<Integer>> inputFromFile(String path) throws FileNotFoundException{
-        Scanner scanner = new Scanner(new File(path));
-        List<List<Integer>> inputs = new ArrayList<>();
-
-        // Iterate through each line in the file
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-
-            String[] tokens = line.split(" ");
-            List<Integer> integers = new ArrayList<>();
-
-            for (String token : tokens)
-                integers.add(Integer.parseInt(token));
-
-            inputs.add(integers);
-        }
-
-        scanner.close();
-        return inputs;
-    }
-
-    private static List<List<Integer>> generateRandomCases(int rows, int cols, int lowerBound, int upperBound){
-        List<List<Integer>> list = new ArrayList<>();
-        Random rng = new Random();
-        for(int i = 0; i<rows; i++){
-            list.add(new ArrayList<>());
-            for(int j = 0; j<cols; j++){
-                list.get(i).add(rng.nextInt(lowerBound, upperBound));
-            }
-        }
-        return list;
     }
 
     public static Program mutation(Program program, boolean verbose) {
@@ -258,7 +222,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), inputs);
-        return -Fitnesses.gecco_4(result.inputs, result.outputs);
+        return -Fitnesses.and(result.inputs, result.outputs);
     }
 
     public Program tournament() {
