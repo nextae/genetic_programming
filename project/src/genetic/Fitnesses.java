@@ -301,9 +301,12 @@ public class Fitnesses {
     public static Fitness xor_xor_or_and_and_or() {
         return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 7, in -> in.get(0) ^ in.get(1) ^ in.get(2) || in.get(3) && in.get(4) && in.get(5) || in.get(6));
     }
+    public static Fitness and_or_or_xor_and_xor() {
+        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 7, in -> in.get(0) && in.get(1) || in.get(2) || in.get(3) ^ in.get(4) && in.get(5) ^ in.get(6));
+    }
 
-    public static Fitness xor_and_or_and_or_or_xor_or_and() {
-        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 8, in -> in.get(0) ^ in.get(1) && in.get(2) || in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7));
+    public static Fitness xor_and_and_and_or_or_xor() {
+        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 8, in -> in.get(0) ^ in.get(1) && in.get(2) && in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7));
     }
 
     public static Fitness and_or_xor_and_or_xor_and() {
@@ -322,116 +325,10 @@ public class Fitnesses {
         return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 10, in -> in.get(0) ^ in.get(1) ^ in.get(2) ^ in.get(3) && in.get(4) && in.get(5) && in.get(6) || in.get(7) || in.get(8) || in.get(9));
     }
 
+    public static Fitness xor_and_or_and_or_or_xor_or_and() {
+        return (inputs, outputs) -> calculateBooleanFunction(inputs, outputs, 10, in -> in.get(0) ^ in.get(1) && in.get(2) || in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7) || in.get(8) && in.get(9));
+    }
 
-//    private static double calculateBooleanFunction(List<List<Integer>> inputs, List<List<Integer>> outputs, int inputSize, Predicate<List<Boolean>> predicate) {
-//        long sum = 0;
-//        for (int i = 0; i < inputs.size(); i++) {
-//            List<Integer> input = inputs.get(i);
-//            List<Integer> output = outputs.get(i);
-//
-//            if (input.size() < inputSize || output.isEmpty()) {
-//                sum += INVALID_VALUE;
-//                continue;
-//            }
-//
-//            List<Boolean> booleanInput = createBooleanInput(input);
-//
-//            sum += (long) calculateBooleanFitness(booleanInput, output, predicate);
-//        }
-//
-//        return (double) sum / inputs.size();
-//    }
-//
-//    private static List<Boolean> createBooleanInput(List<Integer> input) {
-//        List<Boolean> booleanInput = new ArrayList<>();
-//        for (int i : input) {
-//            booleanInput.add(i != 0);
-//        }
-//        return booleanInput;
-//    }
-//
-//    private static double calculateBooleanFitness(List<Boolean> input, List<Integer> output, Predicate<List<Boolean>> predicate) {
-//        int expected = predicate.test(input) ? 1 : -1;
-//
-//        return output.get(0) == expected ? 0 : 1;
-//    }
-
-//    public static double not(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 1, in -> !in.get(0));
-//    }
-//
-//    public static double and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 2, in -> in.get(0) && in.get(1));
-//    }
-//
-//    public static double xor(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 2, in -> in.get(0) ^ in.get(1));
-//    }
-//
-//    public static double and_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 3, in -> in.get(0) && in.get(1) || in.get(2));
-//    }
-//
-//    public static double xor_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 3, in -> in.get(0) ^ in.get(1) && in.get(2));
-//    }
-//
-//    public static double or_and_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 4, in -> in.get(0) || in.get(1) && in.get(2) || in.get(3));
-//    }
-//
-//    public static double and_xor_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 4, in -> in.get(0) && in.get(1) ^ in.get(2) || in.get(3));
-//    }
-//
-//    public static double and_or_xor_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 5, in -> in.get(0) && in.get(1) || in.get(2) ^ in.get(3) && in.get(4));
-//    }
-//
-//    public static double xor_and_xor_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 5, in -> in.get(0) ^ in.get(1) && in.get(2) ^ in.get(3) || in.get(4));
-//    }
-//
-//    public static double and_and_or_xor_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 6, in -> in.get(0) && in.get(1) && in.get(2) || in.get(3) ^ in.get(4) || in.get(5));
-//    }
-//
-//    public static double or_and_xor_xor_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 6, in -> in.get(0) || in.get(1) && in.get(2) ^ in.get(3) ^ in.get(4) && in.get(5));
-//    }
-//
-//    public static double xor_xor_or_and_and_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 7, in -> in.get(0) ^ in.get(1) ^ in.get(2) || in.get(3) && in.get(4) && in.get(5) || in.get(6));
-//    }
-//
-//    public static double and_or_or_xor_and_xor(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 7, in -> in.get(0) && in.get(1) || in.get(2) || in.get(3) ^ in.get(4) && in.get(5) ^ in.get(6));
-//    }
-//
-//    public static double xor_and_and_and_or_or_xor(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 8, in -> in.get(0) ^ in.get(1) && in.get(2) && in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7));
-//    }
-//
-//    public static double and_or_xor_and_or_xor_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 8, in -> in.get(0) && in.get(1) || in.get(2) ^ in.get(3) && in.get(4) || in.get(5) ^ in.get(6) && in.get(7));
-//    }
-//
-//    public static double or_and_xor_and_or_or_xor_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 9, in -> in.get(0) || in.get(1) && in.get(2) ^ in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7) && in.get(8));
-//    }
-//
-//    public static double and_xor_xor_xor_and_and_xor_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 9, in -> in.get(0) && in.get(1) ^ in.get(2) ^ in.get(3) ^ in.get(4) && in.get(5) && in.get(6) ^ in.get(7) || in.get(8));
-//    }
-//
-//    public static double xor_xor_xor_and_and_and_or_or_or(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 10, in -> in.get(0) ^ in.get(1) ^ in.get(2) ^ in.get(3) && in.get(4) && in.get(5) && in.get(6) || in.get(7) || in.get(8) || in.get(9));
-//    }
-//
-//    public static double xor_and_or_and_or_or_xor_or_and(List<List<Integer>> inputs, List<List<Integer>> outputs) {
-//        return calculateBooleanFunction(inputs, outputs, 10, in -> in.get(0) ^ in.get(1) && in.get(2) || in.get(3) && in.get(4) || in.get(5) || in.get(6) ^ in.get(7) || in.get(8) && in.get(9));
-//    }
-//
     private static double calculateBooleanFunction(List<List<Integer>> inputs, List<List<Integer>> outputs, int k, BooleanFunction function) {
         long sum = 0;
         for (int i = 0; i < inputs.size(); i++) {
