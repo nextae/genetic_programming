@@ -19,12 +19,13 @@ public class Solver {
     private static Random random = new Random();
     private int tournamentSize = 3;
     public List<List<Integer>> inputs;
+    Fitnesses.Fitness fitness;
 
-    public Solver(List<List<Integer>> inputs, int numberOfPrograms, int maxDepth, int maxWidth, int epochs) throws FileNotFoundException {
+    public Solver(List<List<Integer>> inputs, int numberOfPrograms, int maxDepth, int maxWidth, int epochs, Fitnesses.Fitness fitness) throws FileNotFoundException {
         this.epochs = epochs;
         for (int i = 0; i < numberOfPrograms; i++)
             programs.add(new Program(maxDepth, maxWidth, GenerationMethods.GROW));
-
+        this.fitness = fitness;
         this.inputs = inputs;
     }
 
@@ -222,7 +223,7 @@ public class Solver {
 
     private double fitness(Program program) {
         ProgramOutput result = App.run(program.toString(), inputs);
-        return -Fitnesses.and(result.inputs, result.outputs);
+        return -fitness.calcFitness(result.inputs, result.outputs);
     }
 
     public Program tournament() {
