@@ -16,6 +16,11 @@ public class Input {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
 
+            if (line.isEmpty()) {
+                inputs.add(new ArrayList<>());
+                continue;
+            }
+
             String[] tokens = line.split(" ");
             List<Integer> integers = new ArrayList<>();
 
@@ -24,6 +29,8 @@ public class Input {
 
             inputs.add(integers);
         }
+        if (inputs.isEmpty())
+            inputs.add(new ArrayList<>());
 
         scanner.close();
         return inputs;
